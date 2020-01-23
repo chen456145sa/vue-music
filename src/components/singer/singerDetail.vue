@@ -81,6 +81,7 @@ export default {
         this.$router.push({  //编程路由
           path: "/singer/"
         })
+        return
       }
       let url ='http://localhost:8888/singer/getSongListbyId/'+this.singer.id;
       this.$http.jsonp(url)

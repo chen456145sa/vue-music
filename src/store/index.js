@@ -51,7 +51,7 @@ var getters={
         return state.currentIndex
 	},
 	currentSong: function(state) {
-        return state.plaayList[state.currentIndex]
+        return state.playList[state.currentIndex]
 	}
 }
 

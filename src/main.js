@@ -5,8 +5,11 @@ import router from './router'
 import './common/css/reset.css'
 //解决移动端 1px 边框的问题
 import './common/css/border.css'
+
 // import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import { Slider } from 'element-ui';
+
 import fastclick from 'fastclick'
 import VueResource from 'vue-resource'
 
@@ -35,6 +38,7 @@ Vue.use(VueLazyload, {
 })
 
 // Vue.use(ElementUI);
+Vue.component(Slider.name, Slider);
 
 /* eslint-disable no-new */
 new Vue({

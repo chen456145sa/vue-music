@@ -1,6 +1,7 @@
 <template>
-  <div class="block">
-    <el-slider v-model="value1" :max="duration" ref="slider" :show-tooltip="false" @change="change"></el-slider>
+  <div class="block" @touchstart="progressTouchStart">
+    <el-slider v-model="value1" :max="duration" ref="slider" :show-tooltip="false" 
+    @change="change" ></el-slider>
   </div>
 </template>
 
@@ -9,7 +10,8 @@
 export default {
   data() {
       return {
-          value1: 0
+          value1: 0,
+          drag: false
       }
   },
   props: {
@@ -26,18 +28,30 @@ export default {
 
   },
   methods: {
-      change(newV) {
+      change(newV) {  //拖拽结束时触发
         this.value1 = newV;
-        // console.log(this.$refs.slider.$el.currentTime)
-        // this.$refs.slider.currentTime = newV
         this.$emit('change',newV);
         console.log(newV)
+        this.drag = false;
+      },
+      progressTouchStart() {
+        this.drag = true;
+        console.log("progressTouchStart")
       }
+      // progressTouchMove() { //解决
+      //   return false
+      // }
   },
   watch: {
     percent(newP) {  //设置进度条
         // console.log('newP:'+newP)
-        this.value1 = newP
+        if(!this.drag) {
+          this.value1 = newP
+        }
+        
+    },
+    drag(newD) {
+      console.log("newD:"+newD)
     }
   }
 

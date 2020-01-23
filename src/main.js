@@ -8,7 +8,7 @@ import './common/css/border.css'
 
 // import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-import { Slider } from 'element-ui';
+import { Slider,Progress } from 'element-ui';
 
 import fastclick from 'fastclick'
 import VueResource from 'vue-resource'
@@ -39,6 +39,7 @@ Vue.use(VueLazyload, {
 
 // Vue.use(ElementUI);
 Vue.component(Slider.name, Slider);
+Vue.component(Progress.name, Progress);
 
 /* eslint-disable no-new */
 new Vue({

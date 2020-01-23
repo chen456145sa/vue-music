@@ -62,8 +62,11 @@
             <h2 class="name" v-html="currentSong.song_name">name</h2>
             <p class="desc" v-html="currentSong.singer_name">desc</p>
           </div>
-          <div class="control">
-            <i :class="playIcon" class="miniPlayIcon" @click.stop="togglePlaying"></i>
+          <div class="control" @click.stop="togglePlaying">
+            <div class="control-wrapper">
+              <i :class="playIcon" class="miniPlayIcon" ></i>
+              <progressCircle class="progressCircle" :duration='duration' :currentTime='currentTime'></progressCircle>
+            </div>
           </div>
           <div class="control">
             <i class="icon-playlist el-icon-s-fold"></i>
@@ -78,17 +81,18 @@
 <script>
 import {mapGetters, mapMutations} from 'vuex'
 import progressBar from '@/components/base/progress-bar/progress-bar'
+import progressCircle from '@/components/base/progress-bar/progress-circle'
 export default {
   data() {
     return {
       songReady: false,
       currentTime: 0,
-      duration: 0,
-      changeVal:0
+      duration: 0
     }
   },
   components: {
-    progressBar
+    progressBar,
+    progressCircle
   },
   mounted() {
     
@@ -174,9 +178,11 @@ export default {
       }
     },
     change(val) {
-      this.changeVal = val;
       this.$refs.audio.currentTime = val;
-      console.log('val:'+val)
+      // console.log('val:'+val)
+      if(!this.playing) {
+        this.togglePlaying()
+      }
     }
     
    
@@ -191,7 +197,7 @@ export default {
       })
     },
     playing(newPlaying) {   //播放暂停
-      console.log('newPlaying:'+newPlaying)
+      // console.log('newPlaying:'+newPlaying)
       let audio =null;
       setTimeout(()=> {
         audio = this.$refs.audio;
@@ -421,9 +427,25 @@ export default {
   padding: 0 10px;
 }
 .control .miniPlayIcon {
-  font-size: 40px;
+  font-size: 44px;
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform: translate(-50%,50%);
+ 
 }
 .control .icon-playlist {
   font-size: 30px;
+}
+.control .control-wrapper {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+.control .progressCircle {
+  position: absolute;
+  bottom: 47%;
+  left: 51%;
+  transform: translate(-50%,50%)
 }       
 </style>

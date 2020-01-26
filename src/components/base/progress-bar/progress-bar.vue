@@ -31,12 +31,12 @@ export default {
       change(newV) {  //拖拽结束时触发
         this.value1 = newV;
         this.$emit('change',newV);
-        console.log(newV)
+        // console.log(newV)
         this.drag = false;
       },
       progressTouchStart() {
         this.drag = true;
-        console.log("progressTouchStart")
+        // console.log("progressTouchStart")
       }
       // progressTouchMove() { //解决
       //   return false
@@ -49,10 +49,10 @@ export default {
           this.value1 = newP
         }
         
-    },
-    drag(newD) {
-      console.log("newD:"+newD)
     }
+    // drag(newD) {
+    //   console.log("newD:"+newD)
+    // }
   }
 
 }

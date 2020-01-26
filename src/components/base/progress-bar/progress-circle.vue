@@ -1,6 +1,6 @@
 <template>
   <div class="progress-circle">
-    <el-progress type="circle" :percentage="currentTime" :width=40 :show-text=false :stroke-width=4>
+    <el-progress type="circle" :percentage="percent" :width=40 :show-text=false :stroke-width=4>
     </el-progress>
   </div>
 </template>
@@ -8,14 +8,9 @@
 <script>
 
 export default {
-  data() {
-      return {
-          per: 0,
-      }
-  },
   computed: {
       percent() {
-          return this.currentTime / this.duration
+          return (this.currentTime / this.duration)*100
       }
   },
   props: {
@@ -35,7 +30,10 @@ export default {
      
   },
   watch: {
-
+    // percent(oldp,newp) {
+    //   console.log('oldp' +oldp)
+    //   console.log('newp'+ newp)
+    // }
   }
 
 }

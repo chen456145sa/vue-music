@@ -33,7 +33,7 @@
               <span class="time time-r">{{formatTime(duration)}}</span>
             </div>
             <div class="operators">
-              <div class="icon i-left">
+              <div class="icon i-left" @click="changeMode">
                 <i class="icon-sequence el-icon-set-up"></i>
               </div>
               <div class="icon i-left">
@@ -54,7 +54,7 @@
       </transition>
       
       <transition name = 'mini'>
-        <div class="mini-player" v-show="!fullScreen" @click="openFull">
+        <div class="mini-player" v-if="!fullScreen" @click="openFull">
           <div class="icon">
             <img  width="60" height="60" :src = "this.singer.img_url">
           </div>
@@ -74,7 +74,7 @@
         </div>
       </transition>
       <audio :src ="currentSong.song_url" ref="audio" 
-      @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
+      @canplay="ready" @error="error" @timeupdate="updateTime" @ended="ended"></audio>
   </div>
 </template>
 
@@ -82,6 +82,8 @@
 import {mapGetters, mapMutations} from 'vuex'
 import progressBar from '@/components/base/progress-bar/progress-bar'
 import progressCircle from '@/components/base/progress-bar/progress-circle'
+import {playMode} from 'common/js/config.js'
+import {shuffle} from 'common/js/util.js'
 export default {
   data() {
     return {
@@ -104,7 +106,9 @@ export default {
         'singer',
         'currentSong',
         'playing',
-        'currentIndex'
+        'currentIndex',
+        'mode',
+        'sequenceList'
     ]),
     playIcon() {
       return this.playing? 'el-icon-video-pause' : 'el-icon-video-play'
@@ -117,7 +121,9 @@ export default {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
-      setCurrentIndex: 'SET_CURRENT_INDEX'
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setPlayMode: 'SET_PLAY_MODE',
+      setPlayList: 'SET_PLAYLIST'
     }),
     back() {
       this.setFullScreen(false)
@@ -128,8 +134,10 @@ export default {
     togglePlaying() {
       this.setPlayingState(!this.playing)
     },
-    prev() { 
+    prev() {
+      console.log('prev') 
       if(!this.songReady) {  //检查是否可以播放 再执行事件
+        console.log('歌曲没准备好') 
         return
       }
       let index = this.currentIndex - 1;
@@ -143,7 +151,9 @@ export default {
       this.songReady = false;
     },
     next() {
+      console.log('next') 
       if(!this.songReady) {
+        console.log('歌曲没准备好') 
         return
       }
       let index = this.currentIndex + 1;
@@ -160,7 +170,19 @@ export default {
       this.songReady = true;
     },
     error() {
+      console.log('歌曲发生错误') 
       this.songReady = true;
+    },
+    ended() { //audio 结束时触发
+      if(this.mode == playMode.loop) {
+        this.loop()
+      }else{
+        this.next()
+      }
+    },
+    loop() {
+      this.$refs.audio.currentTime = 0;
+      this.$refs.audio.play();
     },
     updateTime(e) {
       // console.log(e) 事件对象
@@ -177,21 +199,53 @@ export default {
          return `${minute}:${second}`
       }
     },
-    change(val) {
+    change(val) {  
       this.$refs.audio.currentTime = val;
       // console.log('val:'+val)
       if(!this.playing) {
         this.togglePlaying()
       }
+    },
+
+    changeMode() { //改变mode
+      const mode = (this.mode + 1)%3;
+      this.setPlayMode(mode);
+      console.log(mode)
+      let list = null ;
+
+      if(mode == playMode.random) {
+        console.log('随机模式')
+        list = shuffle(this.sequenceList);   
+      }else {
+        list = this.sequenceList;
+      }
+      this.resetCurrentIndex(list)
+      // console.log('index:'+this.currentIndex)
+      this.setPlayList(list);
+    },
+    resetCurrentIndex(list) {
+      let index = list.findIndex((item) => {
+        return item.song_id === this.currentSong.song_id
+      })
+      this.setCurrentIndex(index)
     }
     
    
   },
   watch: {
-    currentSong() {
+    currentSong(oldSong, newSong) {
+      // console.log(oldSong)
+      // console.log(newSong)
       setTimeout(()=>{
         this.duration = this.$refs.audio.duration; //获取时长
       },200)
+      if(!newSong) {
+        return
+      }
+      if(newSong && newSong.song_id == oldSong.song_id) {
+        this.songReady = true;
+        return
+      }
       this.$nextTick(()=> {
         this.$refs.audio.play();  //歌曲改变时播放
       })
@@ -205,6 +259,9 @@ export default {
       setTimeout(()=> {
         newPlaying ? audio.play() : audio.pause();
       },300)
+    },
+    currentIndex(newIndex) {
+      console.log("newIndex:"+newIndex)
     }
     
   }

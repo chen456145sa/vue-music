@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import * as types from './types'
 import {playMode} from 'common/js/config.js'
+import {shuffle} from 'common/js/util.js'
 Vue.use(Vuex);
 
 //获得本地存储购物车cart数据
@@ -63,6 +64,9 @@ const actions={
 //		context.commit('increment'); //提交一个名为 increment的变化
 //	}
 	selectPlay({commit,state},{list,index}) {
+		if(state.mode == playMode.random) {
+			// let tlist = shuffle(list)
+		}
 		commit(types.SET_PLAYING_STATE,true);
 		commit(types.SET_FULL_SCREEN,true);
 		commit(types.SET_SEQUENCE_LIST,list);
@@ -70,6 +74,15 @@ const actions={
 		commit(types.SET_CURRENT_INDEX,index);
 		console.log('selectPlay')
 		console.log(state.fullScreen)
+	},
+	randomPlay({commit,state},{list}) {
+		commit(types.SET_PLAY_MODE,playMode.random);
+		commit(types.SET_PLAYING_STATE,true);
+		commit(types.SET_FULL_SCREEN,true);
+		commit(types.SET_SEQUENCE_LIST,list);
+		let tlist = shuffle(list)
+		commit(types.SET_PLAYLIST,tlist);
+		commit(types.SET_CURRENT_INDEX,0);
 	}
 }
 

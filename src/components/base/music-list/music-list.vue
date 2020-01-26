@@ -5,7 +5,7 @@
           <span class="break el-icon-back" @click="back"></span>
           <!-- <span class="el-icon-back"></span> -->
           <h1 class="name">{{this.title}}</h1>
-          <a href="javascript:;" class="randomBtn" ref="randomBtn">随机播放</a>
+          <a href="javascript:;" class="randomBtn" ref="randomBtn" @click.stop.prevent="randPlay">随机播放</a>
         </div>
       </div>
       <div class="bg-layer" ref="layer"></div>
@@ -76,7 +76,8 @@ export default {
   methods: {
     //当要同时派发几个commit时调用
     ...mapActions([   
-        'selectPlay'
+        'selectPlay',
+        'randomPlay'
     ]),
     scroll(pos) {
       this.scrollY = pos.y;
@@ -88,6 +89,11 @@ export default {
       this.selectPlay({
           list: this.songList,
           index
+      })
+    },
+    randPlay() {
+      this.randomPlay({
+        list: this.songList
       })
     }
   },

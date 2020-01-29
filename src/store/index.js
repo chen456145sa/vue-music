@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import * as types from './types'
 import {playMode} from 'common/js/config.js'
-import {shuffle} from 'common/js/util.js'
+import {shuffle,findIndex} from 'common/js/util.js'
 Vue.use(Vuex);
 
 //获得本地存储购物车cart数据
@@ -64,16 +64,20 @@ const actions={
 //		context.commit('increment'); //提交一个名为 increment的变化
 //	}
 	selectPlay({commit,state},{list,index}) {
-		if(state.mode == playMode.random) {
-			// let tlist = shuffle(list)
-		}
 		commit(types.SET_PLAYING_STATE,true);
 		commit(types.SET_FULL_SCREEN,true);
 		commit(types.SET_SEQUENCE_LIST,list);
-		commit(types.SET_PLAYLIST,list);
-		commit(types.SET_CURRENT_INDEX,index);
+		//如果是随机播放 找到它在playlist里的对于歌曲
+		if(state.mode == playMode.random) { 
+			//let tlist = shuffle(list)
+			let cindex = findIndex(state.playList,list[index])
+			commit(types.SET_CURRENT_INDEX,cindex);
+			console.log('依然是随机播放模式')
+		}else {
+			commit(types.SET_PLAYLIST,list);
+			commit(types.SET_CURRENT_INDEX,index);
+		}
 		console.log('selectPlay')
-		console.log(state.fullScreen)
 	},
 	randomPlay({commit,state},{list}) {
 		commit(types.SET_PLAY_MODE,playMode.random);

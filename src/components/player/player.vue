@@ -21,7 +21,21 @@
                   <img class="image" :src = "this.singer.img_url">
                 </div>
               </div>
+              <div class="playing-lyric-wrapper">
+                <div class="playing-lyric">{{playingLyric}}</div>
+              </div>
             </div>
+            <Scroll class="middle-r" v-if="hasLyric" :arrayData="currentLyric && currentLyric.lines" ref="lyricScroll">
+              <div class="lyric-wrapper">
+                <div>
+                  <p class="text" 
+                  ref="lyricline"
+                  v-for="(line, index) in currentLyric.lines" 
+                  :key="index"
+                  :class="{'current': currentNum == index}">{{line.txt}}</p>
+                </div>
+              </div>
+            </Scroll>
           </div>
 
           <div class="bottom">
@@ -84,17 +98,25 @@ import progressBar from '@/components/base/progress-bar/progress-bar'
 import progressCircle from '@/components/base/progress-bar/progress-circle'
 import {playMode} from 'common/js/config.js'
 import {shuffle} from 'common/js/util.js'
+ import Lyric from 'lyric-parser'
+ import Scroll from '@/components/base/scroll/iscroll2'
+
 export default {
   data() {
     return {
       songReady: false,
       currentTime: 0,
-      duration: 0
+      duration: 0,
+      currentLyric: null,
+      playingLyric: 'xxxxx',
+      currentNum: 0,
+      hasLyric: false
     }
   },
   components: {
     progressBar,
-    progressCircle
+    progressCircle,
+    Scroll
   },
   mounted() {
     
@@ -228,14 +250,39 @@ export default {
         return item.song_id === this.currentSong.song_id
       })
       this.setCurrentIndex(index)
+    },
+    getSongLrcById() { //获取歌词
+      let url ='http://localhost:8888/singer/getSongLrcById/'+this.currentSong.song_id;
+      this.$http.get(url)
+      .then(result => {
+          // console.log(result);
+          // this.songList = result
+          this.currentLyric = new Lyric(result.bodyText,this.handler);
+          this.hasLyric = true;
+          console.log(this.currentLyric)   
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    },
+    handler({lineNum, txt}) {  //play()时执行handler 回调函数
+      console.log('lineNum:'+lineNum)
+      this.currentNum = lineNum;
+      if(lineNum >=5) {
+        let tolyric = this.$refs.lyricline[lineNum - 5];
+        this.$refs.lyricScroll.scrollToElement(tolyric, 1000)
+      }else {
+        this.$refs.lyricScroll.scrollToElement(this.$refs.lyricline[0], 1000)
+      }
     }
     
    
   },
   watch: {
     currentSong(oldSong, newSong) {
-      // console.log(oldSong)
+      console.log(oldSong)
       // console.log(newSong)
+      this.getSongLrcById();
       setTimeout(()=>{
         this.duration = this.$refs.audio.duration; //获取时长
       },200)
@@ -259,6 +306,7 @@ export default {
       setTimeout(()=> {
         newPlaying ? audio.play() : audio.pause();
       },300)
+     
     },
     currentIndex(newIndex) {
       console.log("newIndex:"+newIndex)
@@ -313,7 +361,7 @@ export default {
   width: 100%;
   top: 80px;
   bottom: 170px;
-  white-space: nowrap;
+  white-space: nowrap; /*这里可以配合子元素inline-block进行盒子不换行排列在一行*/
   font-size: 0;
   /* background-color: rgb(248, 56, 56); */
 }
@@ -349,6 +397,27 @@ export default {
   width: 100%;
   height: 100%;
   border-radius: 50%;
+}
+.middle-r {
+  display: inline-block;
+  vertical-align: top;
+  width: 100%;
+  height: 102%;
+  overflow: hidden;
+}
+.middle-r .lyric-wrapper {
+  width: 80%;
+  margin: 0 auto;
+  overflow: hidden;
+  text-align: center
+}
+.lyric-wrapper .text {
+  line-height: 32px;
+  color: #fff;
+  font-size: 20px;
+}
+.lyric-wrapper .current {
+  color: rgb(229, 253, 7);
 }
 /*底部*/
 .bottom {

@@ -26,8 +26,10 @@ import MScroll from "@/components/base/scroll/iscroll2"
 import songListView from "@/components/base/listview/songListView"
 import Loading from '@/components/base/Loading/Loading'
 import {mapActions} from 'vuex'
+import {playListMinxin} from 'common/js/minxin'
 
 export default {
+  mixins: [playListMinxin],
   data () {
     return {
       show: false,
@@ -95,6 +97,15 @@ export default {
       this.randomPlay({
         list: this.songList
       })
+    },
+    handlePlayList(list) { //处理底部（播放器遮挡）适配问题
+      let bottom = list.length>0 ? '80px' : '';
+      // console.log(this.$refs.songscroll)
+      setTimeout(() => {
+        this.$refs.songscroll.$el.style.bottom = bottom;
+        this.$refs.songscroll.refresh();
+      },1001)
+      
     }
   },
   watch: {

@@ -1,5 +1,5 @@
 <template>
-  <div class="singer" v-if="singerList.length">
+  <div class="singer" v-if="singerList.length" ref="singer">
     <MScroll ref="singerscroll" :listenScroll=true :probeType =3 class="wrapper" @scroll="scroll">
       <ul>
         <li v-for="group in singerList" :key="group.title" class="group" ref="group" >
@@ -31,7 +31,9 @@
 // import MScroll from "@/components/base/scroll/iscroll"
 import MScroll from "@/components/base/scroll/iscroll2"
 import {mapMutations} from "vuex"
+import {playListMinxin} from 'common/js/minxin'
 export default {
+  mixins: [playListMinxin],
   data () {
     return {
       singerList:[],
@@ -62,6 +64,15 @@ export default {
     }
   },
   methods: {
+    handlePlayList(list) {
+      let bottom = list.length>0 ? '80px' : '';
+      setTimeout(() => {
+        this.$refs.singer.style.bottom = bottom;
+        this.$refs.singerscroll.refresh();
+        // console.log('singerlist')
+      },1001)
+      
+    },
     ...mapMutations({
       setSinger: 'SET_SINGER'
     }),
@@ -209,8 +220,10 @@ export default {
     bottom: 0;
   }
   .wrapper {
+    /* position: relative; */
     height: 100%;
     overflow: hidden;
+    /* top: 0; */
   }
   .group {
     padding-top: 20px;

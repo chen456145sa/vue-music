@@ -1,5 +1,5 @@
 <template>
-<div class="recommend">
+<div class="recommend" ref="recommend">
   <MScroll class="recommend-content" ref="scrollView" :arrayData="listInfo">
     <div>
       <m-Swipe></m-Swipe>
@@ -31,7 +31,9 @@ import MSwipe from "@/components/swipe/swipe"
 // import MIscroll from '@/components/base/scroll/iscroll'
 import MScroll from "@/components/base/scroll/iscroll2"
 import Loading from '@/components/base/Loading/Loading'
+import {playListMinxin} from 'common/js/minxin'
 export default {
+  mixins: [playListMinxin],
   data () {
     return {
       listInfo: []
@@ -48,6 +50,14 @@ export default {
     
   },
   methods: {
+    handlePlayList(list) {
+      let bottom = list.length>0 ? '80px' : '';
+      setTimeout(() => {
+        this.$refs.recommend.style.bottom = bottom;
+        this.$refs.scrollView.refresh();
+        // console.log('singerlist')
+      },1001)
+    },
     getSongList() {
       this.$http.get('http://localhost:8888/recommend/getSongList')
       .then(res => {

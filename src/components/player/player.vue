@@ -14,7 +14,10 @@
             <h2 class="subtitle" v-html="currentSong.singer_name">subtitle</h2>
           </div>
 
-          <div class="middle">
+          <div class="middle"
+           @touchstart.prevent="midTouchStart"
+           @touchmove.prevent="midTouchMove"
+           @touchend="midTouchEnd">
             <div class="middle-l" ref="middleL">
               <div class="cd-wrapper" ref="cdWrapper">
                 <div class="cd" :class="cdCls">
@@ -22,7 +25,10 @@
                 </div>
               </div>
               <div class="playing-lyric-wrapper">
-                <div class="playing-lyric">{{playingLyric}}</div>
+                <div class="playing-lyric" v-if="oddplayingLyric.length>0&&evenplayingLyric.length>0">
+                  <p class="left" :class="{'current': oddplayingLyric[currentNum].txt == playingLyric}">{{oddplayingLyric[currentNum].txt}}</p>
+                  <p class="right" :class="{'current': evenplayingLyric[currentNum].txt == playingLyric}">{{evenplayingLyric[currentNum].txt}}</p>
+                </div>
               </div>
             </div>
             <Scroll class="middle-r" v-if="hasLyric" :arrayData="currentLyric && currentLyric.lines" ref="lyricScroll">
@@ -108,9 +114,12 @@ export default {
       currentTime: 0,
       duration: 0,
       currentLyric: null,
-      playingLyric: 'xxxxx',
+      playingLyric: '',
       currentNum: 0,
-      hasLyric: false
+      hasLyric: false,
+      currentShow: 'cd',
+      oddplayingLyric: [],
+      evenplayingLyric: []
     }
   },
   components: {
@@ -139,6 +148,9 @@ export default {
       return this.playing? 'play' : 'play pause'
     }
   },
+  created() {
+    this.touch = {};
+  },
   methods: {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
@@ -154,7 +166,10 @@ export default {
       this.setFullScreen(true)
     },
     togglePlaying() {
-      this.setPlayingState(!this.playing)
+      this.setPlayingState(!this.playing);
+      if(this.currentLyric) {
+        this.currentLyric.togglePlay() //歌词暂停播放回调
+      }
     },
     prev() {
       console.log('prev') 
@@ -162,13 +177,18 @@ export default {
         console.log('歌曲没准备好') 
         return
       }
-      let index = this.currentIndex - 1;
-      if(index == -1) {
-        index = this.playList.length -1;
-      }
-      this.setCurrentIndex(index);
-      if(!this.playing) {  //改变暂停时的状态
-        this.togglePlaying()
+      if(this.playList.length == 1) { //当列表只有一首歌时
+        this.loop()
+      }else {
+
+        let index = this.currentIndex - 1;
+        if(index == -1) {
+          index = this.playList.length -1;
+        }
+        this.setCurrentIndex(index);
+        if(!this.playing) {  //改变暂停时的状态
+          this.togglePlaying()
+        }
       }
       this.songReady = false;
     },
@@ -178,13 +198,18 @@ export default {
         console.log('歌曲没准备好') 
         return
       }
-      let index = this.currentIndex + 1;
-      if(index == this.playList.length) {
-        index = 0;
-      }
-      this.setCurrentIndex(index);
-      if(!this.playing) {
-        this.togglePlaying()
+      if(this.playList.length == 1) { //当列表只有一首歌时
+        this.loop()
+      }else {
+        
+        let index = this.currentIndex + 1;
+        if(index == this.playList.length) {
+          index = 0;
+        }
+        this.setCurrentIndex(index);
+        if(!this.playing) {
+          this.togglePlaying()
+        }
       }
       this.songReady = false;
     },
@@ -195,16 +220,19 @@ export default {
       console.log('歌曲发生错误') 
       this.songReady = true;
     },
-    ended() { //audio 结束时触发
+    ended() { //audio 结束时触发 判断是否是循环
       if(this.mode == playMode.loop) {
         this.loop()
       }else{
         this.next()
       }
     },
-    loop() {
+    loop() { //循环模式
       this.$refs.audio.currentTime = 0;
       this.$refs.audio.play();
+      if(this.currentLyric) {
+        this.currentLyric.seek(0);  //seek() 歌词移动到多少ms处
+      }
     },
     updateTime(e) {
       // console.log(e) 事件对象
@@ -223,9 +251,12 @@ export default {
     },
     change(val) {  
       this.$refs.audio.currentTime = val;
-      // console.log('val:'+val)
+      console.log('val:'+val)
       if(!this.playing) {
         this.togglePlaying()
+      }
+      if(this.currentLyric) {
+        this.currentLyric.seek(val * 1000);
       }
     },
 
@@ -259,10 +290,18 @@ export default {
           // this.songList = result
           this.currentLyric = new Lyric(result.bodyText,this.handler);
           this.hasLyric = true;
+          this.currentLyric.play();
+          this.initoddArray(this.currentLyric.lines);
+          this.initevenArray(this.currentLyric.lines);
+          console.log(this.oddplayingLyric)
           console.log(this.currentLyric)   
       })
       .catch(err => {
         console.log(err);
+        this.currentLyric = null;
+        this.hasLyric = false;
+        this.playingLyric = '';
+        this.currentNum = 0;
       })
     },
     handler({lineNum, txt}) {  //play()时执行handler 回调函数
@@ -274,6 +313,76 @@ export default {
       }else {
         this.$refs.lyricScroll.scrollToElement(this.$refs.lyricline[0], 1000)
       }
+      // this.playingLyric[0] = this.currentLyric.lines[lineNum];
+      // this.playingLyric[1] = this.currentLyric.lines[lineNum +1 ];
+      // console.log(this.playingLyric)
+      this.playingLyric = txt;
+    },
+    initoddArray(list) {
+      for (let index = 0; index < list.length; ) {
+        
+        this.oddplayingLyric.push(list[index]);
+        this.oddplayingLyric.push(list[index]);
+        index+=2;
+      }
+    },
+    initevenArray(list) {
+      for (let index = 1; index < list.length;) {
+        this.evenplayingLyric.push(list[index]);
+        this.evenplayingLyric.push(list[index]);
+        index+=2;
+      }
+    },
+    midTouchStart(e) {
+      // console.log(e)
+      this.touch.initated = true;
+      this.touch.startX = e.touches[0].pageX;
+      this.touch.startY = e.touches[0].pageY;
+    },
+    midTouchMove(e) {
+      if(!this.touch.initated) {
+        return
+      }
+      let left = this.currentShow == 'cd'? 0 : -window.innerWidth;
+      let offsetX = e.touches[0].pageX - this.touch.startX;
+      let offsetY = e.touches[0].pageY - this.touch.startY;
+      let offsetWidth =Math.min(0, Math.max(-window.innerWidth,offsetX + left)); //移动着最小是0  最大时-window.innerWidth
+      this.touch.percent = Math.abs(offsetWidth / window.innerWidth);
+      // console.log(this.touch.percent)
+      // console.log(offsetWidth) 
+      this.$refs.lyricScroll.$el.style['transform'] = `translateX(${offsetWidth}px)`;
+      this.$refs.lyricScroll.$el.style['transitionDuration'] = '0ms'
+      this.$refs.middleL.style.opacity = 1 -  this.touch.percent;
+      this.$refs.middleL.style['transitionDuration'] = '0ms'
+
+    },
+    midTouchEnd(e) {
+      let offsetWidth = 0;
+      let opacity = 0;
+      if(this.currentShow == 'cd') {
+        if(this.touch.percent > 0.15) {
+          offsetWidth = -window.innerWidth;
+          this.currentShow ='lyric';
+          opacity = 0;
+        }else {
+          offsetWidth = 0;
+          opacity = 1;
+        }
+      }else {
+        if(this.touch.percent < 0.85) {
+          offsetWidth = 0;
+          this.currentShow ='cd';
+          opacity = 1;
+        }else {
+          offsetWidth = -window.innerWidth;
+          opacity = 0;
+        }
+      }
+      this.$refs.lyricScroll.$el.style['transform'] = `translateX(${offsetWidth}px)`;
+      this.$refs.lyricScroll.$el.style['transitionDuration'] = '300ms'
+      this.$refs.middleL.style.opacity = opacity;
+      this.$refs.middleL.style['transitionDuration'] = '300ms'
+      this.touch.initated = false;
     }
     
    
@@ -282,6 +391,9 @@ export default {
     currentSong(oldSong, newSong) {
       console.log(oldSong)
       // console.log(newSong)
+      if(this.currentLyric) {
+        this.currentLyric.stop();
+      }
       this.getSongLrcById();
       setTimeout(()=>{
         this.duration = this.$refs.audio.duration; //获取时长
@@ -355,6 +467,8 @@ export default {
   font-size: 18px;
   padding-top: 10px;
 }
+
+
 /* 中部 */
 .middle {
   position: fixed;
@@ -398,6 +512,25 @@ export default {
   height: 100%;
   border-radius: 50%;
 }
+.playing-lyric-wrapper {
+  position: absolute;
+  bottom: -30%;
+  left: 10%;
+  width: 80%;
+  overflow: hidden;
+  text-align: center;
+}
+.playing-lyric {
+  font-size: 20px;
+  color: #fff;
+  text-align: left;
+  
+}
+.playing-lyric .right {
+  padding-top: 10px;
+  text-align: right;
+}
+
 .middle-r {
   display: inline-block;
   vertical-align: top;
@@ -419,6 +552,8 @@ export default {
 .lyric-wrapper .current {
   color: rgb(229, 253, 7);
 }
+
+
 /*底部*/
 .bottom {
   position: absolute;

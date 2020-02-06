@@ -21,13 +21,12 @@
             <div class="middle-l" ref="middleL">
               <div class="cd-wrapper" ref="cdWrapper">
                 <div class="cd" :class="cdCls">
-                  <img class="image" :src = "this.singer.img_url">
+                  <img class="image" :src = "this.singer.img_url||this.disc.img_url">
                 </div>
               </div>
               <div class="playing-lyric-wrapper">
-                <div class="playing-lyric" v-if="oddplayingLyric.length>0&&evenplayingLyric.length>0">
-                  <p class="left" :class="{'current': oddplayingLyric[currentNum].txt == playingLyric}">{{oddplayingLyric[currentNum].txt}}</p>
-                  <p class="right" :class="{'current': evenplayingLyric[currentNum].txt == playingLyric}">{{evenplayingLyric[currentNum].txt}}</p>
+                <div class="playing-lyric">
+                  <p>{{playingLyric}}</p>
                 </div>
               </div>
             </div>
@@ -117,9 +116,7 @@ export default {
       playingLyric: '',
       currentNum: 0,
       hasLyric: false,
-      currentShow: 'cd',
-      oddplayingLyric: [],
-      evenplayingLyric: []
+      currentShow: 'cd'
     }
   },
   components: {
@@ -139,7 +136,8 @@ export default {
         'playing',
         'currentIndex',
         'mode',
-        'sequenceList'
+        'sequenceList',
+        'disc'
     ]),
     playIcon() {
       return this.playing? 'el-icon-video-pause' : 'el-icon-video-play'
@@ -213,7 +211,9 @@ export default {
       }
       this.songReady = false;
     },
-    ready() {
+    ready(e) {
+      this.duration = e.target.duration;
+      console.log('this.duration:'+this.duration)
       this.songReady = true;
     },
     error() {
@@ -237,11 +237,13 @@ export default {
     updateTime(e) {
       // console.log(e) 事件对象
       this.currentTime = e.target.currentTime; //可读写属性
+      // this.duration = e.target.duration;
+      // console.log('this.duration:'+this.duration)
       // e.target.currentTime = this.changeVal;
     },
-    formatTime(time) {
+    formatTime(time) {  //格式化时间
       time = Math.floor(time);
-      let minute = Math.floor(time/60);
+      let minute = Math.floor(time/60).toString();
       let second = Math.floor(time%60);
       if(second.toString().length<2) {
         return `${minute}:0${second}`
@@ -249,7 +251,7 @@ export default {
          return `${minute}:${second}`
       }
     },
-    change(val) {  
+    change(val) {  //滑动条拖拽事件
       this.$refs.audio.currentTime = val;
       console.log('val:'+val)
       if(!this.playing) {
@@ -259,7 +261,6 @@ export default {
         this.currentLyric.seek(val * 1000);
       }
     },
-
     changeMode() { //改变mode
       const mode = (this.mode + 1)%3;
       this.setPlayMode(mode);
@@ -276,7 +277,7 @@ export default {
       // console.log('index:'+this.currentIndex)
       this.setPlayList(list);
     },
-    resetCurrentIndex(list) {
+    resetCurrentIndex(list) {  //随机模式重新设置index
       let index = list.findIndex((item) => {
         return item.song_id === this.currentSong.song_id
       })
@@ -291,10 +292,6 @@ export default {
           this.currentLyric = new Lyric(result.bodyText,this.handler);
           this.hasLyric = true;
           this.currentLyric.play();
-          this.initoddArray(this.currentLyric.lines);
-          this.initevenArray(this.currentLyric.lines);
-          console.log(this.oddplayingLyric)
-          console.log(this.currentLyric)   
       })
       .catch(err => {
         console.log(err);
@@ -305,7 +302,7 @@ export default {
       })
     },
     handler({lineNum, txt}) {  //play()时执行handler 回调函数
-      console.log('lineNum:'+lineNum)
+      // console.log('lineNum:'+lineNum)
       this.currentNum = lineNum;
       if(lineNum >=5) {
         let tolyric = this.$refs.lyricline[lineNum - 5];
@@ -313,25 +310,8 @@ export default {
       }else {
         this.$refs.lyricScroll.scrollToElement(this.$refs.lyricline[0], 1000)
       }
-      // this.playingLyric[0] = this.currentLyric.lines[lineNum];
-      // this.playingLyric[1] = this.currentLyric.lines[lineNum +1 ];
       // console.log(this.playingLyric)
       this.playingLyric = txt;
-    },
-    initoddArray(list) {
-      for (let index = 0; index < list.length; ) {
-        
-        this.oddplayingLyric.push(list[index]);
-        this.oddplayingLyric.push(list[index]);
-        index+=2;
-      }
-    },
-    initevenArray(list) {
-      for (let index = 1; index < list.length;) {
-        this.evenplayingLyric.push(list[index]);
-        this.evenplayingLyric.push(list[index]);
-        index+=2;
-      }
     },
     midTouchStart(e) {
       // console.log(e)
@@ -523,13 +503,9 @@ export default {
 .playing-lyric {
   font-size: 20px;
   color: #fff;
-  text-align: left;
-  
+  text-align: center;
 }
-.playing-lyric .right {
-  padding-top: 10px;
-  text-align: right;
-}
+
 
 .middle-r {
   display: inline-block;

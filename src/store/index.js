@@ -11,6 +11,7 @@ Vue.use(Vuex);
 //定义属性
 var state={
 	singer: {},
+	disc: {},
 	playing: false,
 	fullScreen: false,
 	playList: [],
@@ -32,6 +33,9 @@ var getters={
     // }
     singer: function(state) {
         return state.singer
+	},
+	disc: function(state) {
+        return state.disc
 	},
 	playing: function(state) {
         return state.playing
@@ -96,6 +100,9 @@ const mutations={
     
     [types.SET_SINGER](state, singer) {
         state.singer = singer;
+	},
+	[types.SET_DISC](state, disc) {
+        state.disc = disc;
     },
     [types.SET_PLAYING_STATE](state, flag) {
         state.playing = flag;

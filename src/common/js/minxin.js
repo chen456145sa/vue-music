@@ -6,6 +6,7 @@
   如果键值发生冲突, 则会使用组件的键值对（组件优先）
 */
 import {mapGetters} from 'vuex'
+
 export const playListMinxin = {
     mounted() {  //会混入到组件中 优先与组件执行
         this.handlePlayList(this.playList)

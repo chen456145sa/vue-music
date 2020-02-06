@@ -102,6 +102,7 @@ export default {
       let bottom = list.length>0 ? '80px' : '';
       // console.log(this.$refs.songscroll)
       setTimeout(() => {
+        console.log( this.$refs.songscroll)
         this.$refs.songscroll.$el.style.bottom = bottom;
         this.$refs.songscroll.refresh();
       },1001)

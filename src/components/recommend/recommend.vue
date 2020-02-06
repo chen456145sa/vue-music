@@ -6,7 +6,7 @@
       <div class="recommend-List" v-if="listInfo.length">
         <h1 class="list-title">歌单推荐</h1>
             <ul>
-            <li class="item" v-for="(item,k) in listInfo" :key="k">
+            <li class="item" v-for="(item,k) in listInfo" :key="k" @click="setItem(item)">
               <div class="left_icon">
                 <img v-lazy="item.img_url" alt="" @load="loadImage">
               </div>
@@ -22,6 +22,7 @@
       </div>
     </div>
   </MScroll>
+  <router-view></router-view>
 </div>
 </template>
 
@@ -32,12 +33,18 @@ import MSwipe from "@/components/swipe/swipe"
 import MScroll from "@/components/base/scroll/iscroll2"
 import Loading from '@/components/base/Loading/Loading'
 import {playListMinxin} from 'common/js/minxin'
+import {mapGetters, mapMutations} from 'vuex'
 export default {
   mixins: [playListMinxin],
   data () {
     return {
       listInfo: []
     }
+  },
+  computed: {
+    ...mapGetters([
+      'disc'
+    ])
   },
   created() {
       this.getSongList();
@@ -46,11 +53,18 @@ export default {
       //   _self.getSongList();
       // },1000)
   },
-  watch: {
-    
-  },
   methods: {
-    handlePlayList(list) {
+    ...mapMutations({
+      setDisc: 'SET_DISC'
+    }),
+    setItem(item) {  //路由
+      this.$router.push({  
+        path: "/recommend/"+item.id
+      })
+      this.setDisc(item);
+      console.log(this.disc)
+    },
+    handlePlayList(list) { //适配底部
       let bottom = list.length>0 ? '80px' : '';
       setTimeout(() => {
         this.$refs.recommend.style.bottom = bottom;

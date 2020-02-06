@@ -6,6 +6,7 @@ import Recommend from '@/components/recommend/recommend'
 import Search from '@/components/search/search'
 import Singer from '@/components/singer/singer'
 import SingerDetail from '@/components/singer/singerDetail'
+import Disc from '@/components/disc/disc'
 Vue.use(Router)
 //vue-router3.0错误解决
 const routerPush = Router.prototype.push  
@@ -20,7 +21,13 @@ export default new Router({
     },
     {
       path: '/recommend',
-      component: Recommend
+      component: Recommend,
+      children: [
+        {
+          path:':id',
+          component: Disc
+        }
+      ]
     },
     {
       path: '/rank',

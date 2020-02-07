@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Header from '@/components/Header'
-import Rank from '@/components/rank/rank'
+import Category from '@/components/category/category'
+import CategoryInner from '@/components/category/categoryInner'
 import Recommend from '@/components/recommend/recommend'
 import Search from '@/components/search/search'
 import Singer from '@/components/singer/singer'
@@ -30,8 +31,14 @@ export default new Router({
       ]
     },
     {
-      path: '/rank',
-      component: Rank
+      path: '/category',
+      component: Category,
+      children: [
+        {
+          path:':tag',
+          component: CategoryInner
+        }
+      ]
     },
     {
       path: '/search',

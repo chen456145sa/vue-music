@@ -1,65 +1,100 @@
 <template>
-  <div class="categoryInner">
-      <MScroll class="wrapper">
-        <div>
-           <el-card :body-style="{ padding: '0px' }" v-for="(item, k) in cateList" :key="k">
-                <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image">
-                <div style="padding: 14px;">
-                    <span>{{item.title}}</span>
+  <div class="categoryInner" ref="categoryInner">
+      <MScroll class="wrapper" ref="innerScroll">
+        <div v-if="cateList.length>0">
+           <div v-for="(item, k) in cateList" :key="k" class="card" @click.prevent="setItem(item)">
+                <img :src="item.img_url" class="image">
+                <div class="disc-container">
+                    <span class="title">{{item.title}}</span>
                     <div class="bottom clearfix">
-                    <time class="time">{{item.disc}}</time>
+                    <span class="time">{{item.disc}}</span>
+                    <span class="creator">{{item.creator}}</span>
                     </div>
                 </div>
-            </el-card> 
+            </div> 
         </div>
       </MScroll>
+      <router-view class="cateList"></router-view>
   </div>
 </template>
 
 <script>
 import MScroll from "@/components/base/scroll/iscroll2"
+import {mapMutations, mapGetters} from "vuex"
+import {playListMinxin} from 'common/js/minxin'
 export default {
-  props: {
-  },
+  mixins: [playListMinxin],
   data() {
     return {
-        cateList: []
+        cateList: [],
+        tag: ''
     }
   },
   created() {
-    //   console.log(this.$route.params)
-    this.getSongListByTag();
+    this.tag = this.$route.params.tag
+  },
+  computed: {
+    ...mapGetters([
+      'cateSongs',
+      'clicked'
+    ])
   },
   mounted() {
-
+    this.getSongListByTag();
+  },
+  activated() {
   },
   components: {
       MScroll
   },
   methods: {
+      ...mapMutations({
+        setCateSong: 'SET_CATE_SONG'
+      }),
+      handlePlayList(list) {
+        let bottom = list.length>0 ? '80px' : '';
+        setTimeout(() => {
+          if(this.clicked) {
+            this.$refs.categoryInner.style.bottom = bottom;
+            this.$refs.innerScroll.refresh();
+          }
+        },1001)
+      },
       getSongListByTag() {
         let url ='http://localhost:8888/category/getCategoryByTag/'+this.$route.params.tag;
         this.$http.jsonp(url)
         .then(result => {
-            // console.log(result);
-            // this.cateArr = result.body.list 
-            // console.log(this.cateArr)
             this.cateList = result.body;
-            console.log(this.cateList)
         })
         .catch(err => {
             console.log(err);
         })
+      },
+      setItem(item) {
+        console.log('setItem')
+        console.log(this.tag)
+        console.log(item)
+        this.$router.push({  //编程路由
+          path: '/category/'+this.tag+'/'+item.id
+        })
+        this.setCateSong(item)
       }
+
   },
   watch: {
-
+    '$route' (to, from) {
+      // 对路由变化作出响应...
+      if(this.$route.params.tag) {
+         this.getSongListByTag();
+        //  console.log(this.$route.params.tag)
+      }
   }
-
+  }
 }
 </script>
 
 <style scoped>
+
 .categoryInner {
     position: fixed;
     width: 100%;
@@ -70,5 +105,44 @@ export default {
 .wrapper {
     height: 100%;
     overflow: hidden;
+}
+.card {
+  width: 48%;
+  overflow: hidden;
+  float: left;
+  margin-bottom: 6px;
+  margin-left: 1%;
+}
+.image {
+  width: 100%;
+}
+.title {
+  display: inline-block;
+  padding-top: 12px;
+  padding-left: 8px;
+  font-weight: 500;
+  font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif
+}
+.disc-container {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  text-align: left;
+}
+.time {
+  display: inline-block;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 9px;
+  font-weight: 500;
+  font-size: 13px;
+  color: rgb(141, 141, 141);
+}
+.creator {
+  position: absolute;
+  right: 6px;
+  bottom: 8px;
+  vertical-align: bottom;
+  color: rgb(141, 141, 141);
 }
 </style>

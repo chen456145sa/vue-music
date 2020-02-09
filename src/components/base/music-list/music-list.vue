@@ -10,7 +10,7 @@
       </div>
       <div class="bg-layer" ref="layer"></div>
       <MScroll :arrayData = "songList" :probeType =3 :listenScroll=true 
-      class="songscroll" ref="songscroll" @scroll="scroll">
+      class="songscroll" ref="songscroll" @scroll="scroll" v-if="songList.length>0">
          <div class="listwrapper">
             <songListView :songs = "songList" @select="selectItem"></songListView>
         </div>
@@ -25,7 +25,7 @@
 import MScroll from "@/components/base/scroll/iscroll2"
 import songListView from "@/components/base/listview/songListView"
 import Loading from '@/components/base/Loading/Loading'
-import {mapActions} from 'vuex'
+import {mapActions,mapMutations} from 'vuex'
 import {playListMinxin} from 'common/js/minxin'
 
 export default {
@@ -63,7 +63,9 @@ export default {
   mounted() {
     var _self = this;
     setTimeout(()=> {
-      this.$refs.songscroll.refresh();
+      if(this.$refs.songscroll) {
+        this.$refs.songscroll.refresh();
+      }
       //遮罩层最大滚动高度
       this.maxHeight = - this.$refs.top.clientHeight + 40;
     //   console.log( this.maxHeight)
@@ -81,6 +83,9 @@ export default {
         'selectPlay',
         'randomPlay'
     ]),
+    ...mapMutations({
+      setClicked: 'SET_CLICK_FLAG'
+    }),
     scroll(pos) {
       this.scrollY = pos.y;
     },
@@ -92,6 +97,7 @@ export default {
           list: this.songList,
           index
       })
+      this.setClicked(true);
     },
     randPlay() {
       this.randomPlay({
@@ -102,9 +108,11 @@ export default {
       let bottom = list.length>0 ? '80px' : '';
       // console.log(this.$refs.songscroll)
       setTimeout(() => {
-        console.log( this.$refs.songscroll)
-        this.$refs.songscroll.$el.style.bottom = bottom;
-        this.$refs.songscroll.refresh();
+        // console.log( this.$refs.songscroll)
+        if(this.$refs.songscroll) {
+          this.$refs.songscroll.$el.style.bottom = bottom;
+          this.$refs.songscroll.refresh();
+        }
       },1001)
       
     }

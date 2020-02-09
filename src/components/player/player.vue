@@ -21,7 +21,7 @@
             <div class="middle-l" ref="middleL">
               <div class="cd-wrapper" ref="cdWrapper">
                 <div class="cd" :class="cdCls">
-                  <img class="image" :src = "this.singer.img_url||this.disc.img_url">
+                  <img class="image" :src ="currentSong.photo">
                 </div>
               </div>
               <div class="playing-lyric-wrapper">
@@ -75,7 +75,7 @@
       <transition name = 'mini'>
         <div class="mini-player" v-if="!fullScreen" @click="openFull">
           <div class="icon">
-            <img  width="60" height="60" :src = "this.singer.img_url">
+            <img  width="60" height="60" :src ="currentSong.photo">
           </div>
           <div class="text">
             <h2 class="name" v-html="currentSong.song_name">name</h2>

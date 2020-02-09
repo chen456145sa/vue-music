@@ -1,6 +1,6 @@
 <template>
-  <div class="category">
-    <MScroll class="wrapper">
+  <div class="category" ref="category">
+    <MScroll class="wrapper" ref="cateWrapper">
       <div>
         <h1 class="good-cate">精选分类</h1>
         <ul class="cate-container">
@@ -52,7 +52,10 @@
 
 <script>
 import MScroll from "@/components/base/scroll/iscroll2"
+import {playListMinxin} from 'common/js/minxin'
+import {mapGetters} from 'vuex'
 export default {
+  mixins:[playListMinxin],
   created() {
     this.getCategory();
   },
@@ -64,21 +67,37 @@ export default {
   components: {
     MScroll
   },
+  computed: {
+    ...mapGetters([
+      'clicked'
+    ])
+  },
   methods: {
+    handlePlayList(list) {
+      let bottom = list.length>0 ? '80px' : '';
+      setTimeout(() => {
+        if(this.clicked) {
+          this.$refs.category.style.bottom = bottom;
+          this.$refs.cateWrapper.refresh();
+        }
+        // console.log('singerlist')
+      },1001)
+      
+    },
     getCategory() {
       let url ='http://localhost:8888/category/getCategory';
       this.$http.jsonp(url)
       .then(result => {
           //console.log(result);
           this.cateArr = result.body.list 
-          console.log(this.cateArr)   
+          // console.log(this.cateArr)   
       })
       .catch(err => {
         console.log(err);
       })
     },
     findTag(tag) {
-      console.log(tag)
+      // console.log(tag)
       this.$router.push({
         path: '/category/'+tag
       })

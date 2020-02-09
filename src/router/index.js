@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Header from '@/components/Header'
 import Category from '@/components/category/category'
 import CategoryInner from '@/components/category/categoryInner'
+import Catesonglist from '@/components/category/catesonglist'
 import Recommend from '@/components/recommend/recommend'
 import Search from '@/components/search/search'
 import Singer from '@/components/singer/singer'
@@ -32,13 +33,15 @@ export default new Router({
     },
     {
       path: '/category',
-      component: Category,
-      children: [
-        {
-          path:':tag',
-          component: CategoryInner
-        }
-      ]
+      component: Category
+    },
+    {
+      path: '/category/:tag',
+      component: CategoryInner
+    },
+    {
+      path: '/category/:tag/:id',
+      component: Catesonglist,
     },
     {
       path: '/search',

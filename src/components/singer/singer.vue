@@ -13,7 +13,7 @@
         </li>
       </ul>
     </MScroll>
-    <div class="list-aside">
+    <div class="list-aside" ref="aside">
       <ul>
         <li v-for="(item, key) in shortcutList" :key="key" class="aside_item"
         :class="{'active': currentIndex === key}" 
@@ -30,7 +30,7 @@
 <script>
 // import MScroll from "@/components/base/scroll/iscroll"
 import MScroll from "@/components/base/scroll/iscroll2"
-import {mapMutations} from "vuex"
+import {mapMutations,mapGetters} from "vuex"
 import {playListMinxin} from 'common/js/minxin'
 export default {
   mixins: [playListMinxin],
@@ -61,14 +61,20 @@ export default {
         List.push(item.title)
       })
       return List
-    }
+    },
+    ...mapGetters([
+      'clicked'
+    ])
   },
   methods: {
     handlePlayList(list) {
       let bottom = list.length>0 ? '80px' : '';
       setTimeout(() => {
-        this.$refs.singer.style.bottom = bottom;
-        this.$refs.singerscroll.refresh();
+        if(this.clicked) {
+          this.$refs.singer.style.bottom = bottom;
+          this.$refs.aside.style.top = '46%';
+          this.$refs.singerscroll.refresh();
+        }
         // console.log('singerlist')
       },1001)
       

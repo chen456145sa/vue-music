@@ -43,7 +43,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'disc'
+      'disc',
+      'clicked'
     ])
   },
   created() {
@@ -67,8 +68,10 @@ export default {
     handlePlayList(list) { //适配底部
       let bottom = list.length>0 ? '80px' : '';
       setTimeout(() => {
-        this.$refs.recommend.style.bottom = bottom;
-        this.$refs.scrollView.refresh();
+        if(this.clicked) {
+          this.$refs.recommend.style.bottom = bottom;
+          this.$refs.scrollView.refresh();
+        }
         // console.log('singerlist')
       },1001)
     },

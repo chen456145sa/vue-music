@@ -17,7 +17,9 @@ var state={
 	playList: [],
 	sequenceList: [],
 	mode: playMode.sequence,
-	currentIndex: -1
+	currentIndex: -1,
+	cateSongs: {},
+	clicked: false
 }
 
 //定义getters 访问数据的第二种方式 （不可以在这里改变数据）可以认为是 store 的计算属性
@@ -36,6 +38,12 @@ var getters={
 	},
 	disc: function(state) {
         return state.disc
+	},
+	cateSongs: function(state) {
+        return state.cateSongs
+	},
+	clicked: function(state) {
+        return state.clicked
 	},
 	playing: function(state) {
         return state.playing
@@ -103,6 +111,12 @@ const mutations={
 	},
 	[types.SET_DISC](state, disc) {
         state.disc = disc;
+	},
+	[types.SET_CATE_SONG](state, cateSongs) {
+        state.cateSongs = cateSongs;
+	},
+	[types.SET_CLICK_FLAG](state, clicked) {
+        state.clicked = clicked;
     },
     [types.SET_PLAYING_STATE](state, flag) {
         state.playing = flag;

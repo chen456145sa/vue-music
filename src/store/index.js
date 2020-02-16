@@ -71,10 +71,6 @@ var getters={
 //定义actions ，要执行的方法  当要同时派发几个commit时调用
 //$store.dispatch('increment')
 const actions={
-//	increment(context,state){
-//		console.log(context);
-//		context.commit('increment'); //提交一个名为 increment的变化
-//	}
 	selectPlay({commit,state},{list,index}) {
 		commit(types.SET_PLAYING_STATE,true);
 		commit(types.SET_FULL_SCREEN,true);
@@ -99,6 +95,39 @@ const actions={
 		let tlist = shuffle(list)
 		commit(types.SET_PLAYLIST,tlist);
 		commit(types.SET_CURRENT_INDEX,0);
+	},
+	insertSong({commit,state},song) {
+		let playList = state.playList.slice(0);
+		let sequenceList = state.sequenceList.slice(0);
+		let currentIndex = state.currentIndex;
+		console.log(playList)
+		if(playList.length>0) {  //有播放列表时
+			let currentSong = playList[currentIndex]
+			let fpindex = findIndex(playList, song);
+			if(fpindex > -1) { //有这首歌时 查看是否在播放 如果在播放就全屏
+				if(currentSong.song_id == song.song_id) {
+					commit(types.SET_FULL_SCREEN,true);
+				}else {  //如果播放的不是这首个 则设置到这首歌的index
+					currentIndex = findIndex(playList, song);
+					commit(types.SET_FULL_SCREEN,true);
+					commit(types.SET_CURRENT_INDEX,currentIndex);	
+				}
+			}else {  //如果播放列表没有 则加入到列表中 从新设置index
+				playList.push(song);  
+				currentIndex = findIndex(playList, song);
+				commit(types.SET_PLAYLIST,playList);
+				commit(types.SET_FULL_SCREEN,true);
+				commit(types.SET_CURRENT_INDEX,currentIndex);
+			}
+		}else { //播放列表为空时 则加入到列表中
+			playList.push(song);  
+			commit(types.SET_PLAYLIST,playList);
+			commit(types.SET_FULL_SCREEN,true);
+			commit(types.SET_CURRENT_INDEX,0);
+		}
+		commit(types.SET_PLAYING_STATE,true);
+		commit(types.SET_SEQUENCE_LIST,playList);
+		console.log(state.sequenceList)
 	}
 }
 

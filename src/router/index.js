@@ -48,6 +48,10 @@ export default new Router({
       component: Search
     },
     {
+      path: '/search/singer/:id',
+      component: SingerDetail
+    },
+    {
       path: '/singer',
       component: Singer,
       children: [

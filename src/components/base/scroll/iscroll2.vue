@@ -29,7 +29,9 @@ export default {
       listenScroll: {
         type: Boolean,
         default: false
-      }
+      },
+      pullup: Boolean,
+      default: false
   },
   mounted() {
       var _self = this;
@@ -51,9 +53,19 @@ export default {
               click: this.click
           })
           if (this.listenScroll) { //监听滚动事件
-            let _self = this
+            let _self = this;
             this.scroll.on('scroll', (pos) => {
                 _self.$emit('scroll', pos)
+            })
+          }
+
+          if(this.pullup) {  //上拉滚动
+              let _self = this;
+              this.scroll.on('scrollEnd', () => {
+                  if(_self.scroll.y <= _self.scroll.maxScrollY + 50) {
+                      _self.$emit('scrollToEnd')
+                    //   console.log('scrollEnd')
+                  }
             })
           }
       },

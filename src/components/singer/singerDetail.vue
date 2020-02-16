@@ -59,6 +59,12 @@ export default {
     },1000)
     
   },
+  activated() {
+    setTimeout(() => {  
+      this.getSingerDetail()
+    },1000)
+    console.log('activated')
+  },
   mounted() {
     // var _self = this;
     // setTimeout(()=> {
@@ -137,7 +143,7 @@ export default {
     //     this.$refs.top.style['webkitTransform'] = `scale(${scale})`;
     //   }
     // }
-
+    
   }
 }
 </script>

@@ -189,7 +189,7 @@ export default {
     }
   },
   watch: {
-    scrollY(newY) {  //监测Y值 的区间
+    scrollY(newY) {  //监测Y值 的区间 改变index 实现类的改变 左右联动
       let GroupListHeight = this.GroupListHeight;
       // console.log(newY)
       if(newY>0) {

@@ -14,3 +14,15 @@ export function findIndex(list, song) {
        return item.song_id == song.song_id 
     })
 }
+//节流函数
+export function debounce(func, delay) {
+    let timer = null;
+    return function(...args) {  // let args = arguments
+        if(timer) {
+            clearTimeout(timer);
+        }
+        timer = setTimeout(() => {
+            func.apply(this, args);
+        }, delay)
+    }
+}

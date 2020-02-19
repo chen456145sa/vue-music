@@ -11,7 +11,7 @@
     </div>
     <div class="clearfix"></div>
     <div v-show="query" class="suggest-container">
-      <Suggest :query="query"></Suggest>
+      <Suggest :query="query" @beforeScroll ='blurInput'></Suggest>
     </div>
     <router-view></router-view>
   </div>
@@ -50,6 +50,9 @@ export default {
     getQuery(val) {
       // console.log(val)
       this.query = val;
+    },
+    blurInput() {  //失去焦点
+      this.$refs.searchbox.blur()
     }
   },
   components: {

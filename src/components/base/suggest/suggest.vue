@@ -4,6 +4,8 @@
       :arrayData ='results.song' 
       :pullup='pullup' 
       @scrollToEnd="searchMore"
+      :beforeScroll ='beforeScroll'
+      @beforeScroll = 'listbeforeScroll'
       ref="suggestScroll">
         <ul class="suggest-list">
             <div>
@@ -20,6 +22,9 @@
             </div>
             <Loading v-if="hasmore" :title="title"></Loading>
         </ul>
+        <div class="no-find">
+            <Nofind v-if="query && !hasmore"></Nofind>
+        </div>
       </MScroll>
   </div>
 </template>
@@ -28,6 +33,7 @@
 // import {jsonp} from 'common/js/jsonp'
 import MScroll from "@/components/base/scroll/iscroll2"
 import Loading from '@/components/base/Loading/Loading'
+import Nofind from '@/components/base/nofind/nofind'
 import {mapActions,mapMutations} from 'vuex'
 export default {
   props: {
@@ -42,6 +48,7 @@ export default {
           page: 1,
           perpage: 15,
           pullup: true,
+          beforeScroll: true,
           hasmore: true,
           title: ''
       }
@@ -51,7 +58,8 @@ export default {
   },
   components: {
       MScroll,
-      Loading
+      Loading,
+      Nofind
   },
   methods: {
     ...mapActions([
@@ -154,7 +162,10 @@ export default {
     },
     selectSong(song){   //设置播放列表 打开播放器
         this.insertSong(song)
-    }
+    },
+    listbeforeScroll() {  //滚动之前收起模拟键盘
+        this.$emit('beforeScroll')
+    }  
   },
   watch: {
       query(newQuery) {
@@ -201,6 +212,13 @@ export default {
 .suggest-list li p {
     display: inline-block;
     padding-left: 5px;
+}
+.no-find {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 </style>

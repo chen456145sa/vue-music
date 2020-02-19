@@ -30,8 +30,14 @@ export default {
         type: Boolean,
         default: false
       },
-      pullup: Boolean,
-      default: false
+      pullup: {
+        type:Boolean,
+        default: false
+      },
+      beforeScroll: {
+        type: Boolean,
+        default: false
+      }
   },
   mounted() {
       var _self = this;
@@ -52,22 +58,30 @@ export default {
               probeType: this.probeType,
               click: this.click
           })
-          if (this.listenScroll) { //监听滚动事件
+          if (this.listenScroll) { //监听滚动事件 获取y
             let _self = this;
             this.scroll.on('scroll', (pos) => {
                 _self.$emit('scroll', pos)
             })
           }
 
-          if(this.pullup) {  //上拉滚动
+          if(this.pullup) {  //上拉滚动 判断是否到底部
               let _self = this;
               this.scroll.on('scrollEnd', () => {
                   if(_self.scroll.y <= _self.scroll.maxScrollY + 50) {
                       _self.$emit('scrollToEnd')
                     //   console.log('scrollEnd')
                   }
+              })
+          }
+
+          if(this.beforeScroll) {  //滚动之前触发
+            let _self = this;
+            this.scroll.on('beforeScrollStart', () => {
+                _self.$emit('beforeScroll')
             })
           }
+
       },
       enable() {
           this.scroll && this.scroll.enable();

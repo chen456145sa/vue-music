@@ -10,8 +10,14 @@
       </ul>
     </div>
     <div class="clearfix"></div>
+    <div class="search-history" v-if="!query">
+      <div>
+        <h1 class="title">搜索历史</h1>
+      </div>
+      <searchList :data='searchHistory' @setQuery='setQuery' @deleteSearch='deleteSearch'></searchList>
+    </div>
     <div v-show="query" class="suggest-container">
-      <Suggest :query="query" @beforeScroll ='blurInput'></Suggest>
+      <Suggest :query="query" @beforeScroll ='blurInput' @saveHistory='saveHistory'></Suggest>
     </div>
     <router-view></router-view>
   </div>
@@ -20,6 +26,8 @@
 <script>
 import SearchBox from '@/components/base/searchbox/searchbox'
 import Suggest from '@/components/base/suggest/suggest'
+import searchList from '@/components/search/search-list'
+import {mapActions,mapGetters} from 'vuex'
 export default {
   data () {
     return {
@@ -30,7 +38,16 @@ export default {
   created() {
     this.getHotKey();
   },
+  computed: {
+    ...mapGetters([
+      'searchHistory'
+    ])
+  },
   methods: {
+    ...mapActions([
+      'saveSearchHistory',
+      'deleteSearchHistory'
+    ]),
     getHotKey() {
       let url ='http://localhost:8888/search/getHotKey';
       this.$http.jsonp(url)
@@ -53,11 +70,25 @@ export default {
     },
     blurInput() {  //失去焦点
       this.$refs.searchbox.blur()
+    },
+    saveHistory() {  //存储搜索词
+      // console.log('saveHistory')
+      this.saveSearchHistory(this.query);
+      console.log( this.searchHistory)
+    },
+
+    setQuery(item) {
+      this.$refs.searchbox.setQuery(item)
+      this.query = item;
+    },
+    deleteSearch(item) {
+      this.deleteSearchHistory(item)
     }
   },
   components: {
     SearchBox,
-    Suggest
+    Suggest,
+    searchList
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="suggest">
+  <div class="suggest" v-if="results.song">
       <MScroll class="container" 
       :arrayData ='results.song' 
       :pullup='pullup' 
@@ -23,7 +23,7 @@
             <Loading v-if="hasmore" :title="title"></Loading>
         </ul>
         <div class="no-find">
-            <Nofind v-if="query && !hasmore"></Nofind>
+            <Nofind v-if="!results.song.length"></Nofind>
         </div>
       </MScroll>
   </div>
@@ -158,13 +158,19 @@ export default {
         this.$router.push({  //编程路由
             path: "/search/singer/"+obj.id
         })
-        // console.log(this.$store.getters.singer)
+        
+        this.setHistory();
     },
     selectSong(song){   //设置播放列表 打开播放器
-        this.insertSong(song)
+        this.insertSong(song);
+        
+        this.setHistory();
     },
     listbeforeScroll() {  //滚动之前收起模拟键盘
         this.$emit('beforeScroll')
+    },
+    setHistory() { //派发事件
+        this.$emit('saveHistory')
     }  
   },
   watch: {

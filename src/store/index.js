@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import * as types from './types'
 import {playMode} from 'common/js/config.js'
 import {shuffle,findIndex} from 'common/js/util.js'
+import {saveSearch,loadSearch,deleteSearch,clearSearch} from 'common/js/cache.js'
 Vue.use(Vuex);
 
 //获得本地存储购物车cart数据
@@ -19,7 +20,8 @@ var state={
 	mode: playMode.sequence,
 	currentIndex: -1,
 	cateSongs: {},
-	clicked: false
+	clicked: false,
+	searchHistory: loadSearch()
 }
 
 //定义getters 访问数据的第二种方式 （不可以在这里改变数据）可以认为是 store 的计算属性
@@ -44,6 +46,9 @@ var getters={
 	},
 	clicked: function(state) {
         return state.clicked
+	},
+	searchHistory: function(state) {
+        return state.searchHistory
 	},
 	playing: function(state) {
         return state.playing
@@ -128,6 +133,16 @@ const actions={
 		commit(types.SET_PLAYING_STATE,true);
 		commit(types.SET_SEQUENCE_LIST,playList);
 		console.log(state.sequenceList)
+	},
+	saveSearchHistory({commit},query) {
+		let history = saveSearch(query)
+		commit(types.SET_SEARCH_HISTORY,history)
+	},
+	deleteSearchHistory({commit},query) {
+		commit(types.SET_SEARCH_HISTORY,deleteSearch(query))
+	},
+	clearSearchHistory({commit}) {
+		commit(types.SET_SEARCH_HISTORY,clearSearch())
 	}
 }
 
@@ -146,6 +161,9 @@ const mutations={
 	},
 	[types.SET_CLICK_FLAG](state, clicked) {
         state.clicked = clicked;
+	},
+	[types.SET_SEARCH_HISTORY](state, history) {
+        state.searchHistory = history;
     },
     [types.SET_PLAYING_STATE](state, flag) {
         state.playing = flag;

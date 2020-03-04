@@ -23,7 +23,7 @@
             <Loading v-if="hasmore" :title="title"></Loading>
         </ul>
         <div class="no-find">
-            <Nofind v-if="!results.song.length"></Nofind>
+            <Nofind v-if="!results.song.length && !results.singer.singer_name"></Nofind>
         </div>
       </MScroll>
   </div>
@@ -158,20 +158,23 @@ export default {
         this.$router.push({  //编程路由
             path: "/search/singer/"+obj.id
         })
-        
-        this.setHistory();
+
+        this.setHistory(singer.singer_name);
     },
     selectSong(song){   //设置播放列表 打开播放器
-        this.insertSong(song);
-        
-        this.setHistory();
+        console.log('下面是歌:')
+        console.log(song)
+        this.setHistory(song.song_name);
+
+        this.insertSong(song); 
     },
     listbeforeScroll() {  //滚动之前收起模拟键盘
         this.$emit('beforeScroll')
     },
-    setHistory() { //派发事件
-        this.$emit('saveHistory')
-    }  
+    setHistory(name) { //派发事件
+        this.$emit('saveHistory',name)
+    }
+      
   },
   watch: {
       query(newQuery) {

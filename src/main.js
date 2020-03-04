@@ -8,7 +8,7 @@ import './common/css/border.css'
 
 // import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-import { Slider,Progress,Card,Input} from 'element-ui';
+import { Slider,Progress,Card,Input,Dialog,Button} from 'element-ui';
 
 import fastclick from 'fastclick'
 import VueResource from 'vue-resource'
@@ -42,6 +42,8 @@ Vue.component(Slider.name, Slider);
 Vue.component(Progress.name, Progress);
 Vue.component(Card.name, Card);
 Vue.component(Input.name, Input);
+Vue.component(Dialog.name, Dialog);
+Vue.component(Button.name, Button);
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

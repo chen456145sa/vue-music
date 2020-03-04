@@ -135,10 +135,19 @@ const actions={
 		console.log(state.sequenceList)
 	},
 	saveSearchHistory({commit},query) {
+		if(!query) {
+			console.log('无效query')
+			return
+		}
 		let history = saveSearch(query)
+		console.log(history)
 		commit(types.SET_SEARCH_HISTORY,history)
 	},
 	deleteSearchHistory({commit},query) {
+		if(!query) {
+			console.log('无效query')
+			return
+		}
 		commit(types.SET_SEARCH_HISTORY,deleteSearch(query))
 	},
 	clearSearchHistory({commit}) {

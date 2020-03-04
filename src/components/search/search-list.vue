@@ -1,7 +1,7 @@
 <template>
-  <div class="search-list">
+  <div class="search-list" v-show="historyArray.length">
     <ul>
-      <li class="item" v-for="(item, index) in data" :key="index" @click="setInput(item)">
+      <li class="item" v-for="(item, index) in historyArray" :key="index" @click="setInput(item)">
         <span class="query">{{item}}</span>
         <span class="el-icon-close icon" @click.stop="deleteItem(item)"></span>
       </li>
@@ -13,7 +13,7 @@
 
 export default {
   props: {
-      data: {
+      historyArray: {
           type: Array,
           default: []
       }

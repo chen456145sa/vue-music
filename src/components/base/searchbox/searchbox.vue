@@ -13,7 +13,7 @@ export default {
       }
   },
   mounted() {
-      console.log(this.$refs.input)
+    //   console.log(this.$refs.input)
   },
   activated() {
       this.query = '';

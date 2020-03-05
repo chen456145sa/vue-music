@@ -97,7 +97,7 @@ export default {
           list: this.songList,
           index
       })
-      this.setClicked(true);
+      this.setClicked(true);   //设置clicked 
     },
     randPlay() {
       this.randomPlay({

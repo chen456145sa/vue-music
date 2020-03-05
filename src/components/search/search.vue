@@ -1,8 +1,8 @@
 <template>
   <div class="search">
     <SearchBox ref="searchbox" @query="getQuery"></SearchBox>
-    <MScroll class="searchScroll" :arrayData='shortcut' v-if="!query">
-      <div >
+    <MScroll class="searchScroll" :arrayData='shortcut' v-show="!query" ref="searchScroll">
+      <div class="scrollWrapper" ref="scrollWrapper">
         <div class="hotSearch" v-show="!query">
           <h1 class="title">热门搜索</h1>
           <ul class="hotlist">
@@ -12,7 +12,7 @@
           </ul>
         </div>
         <div class="clearfix"></div>
-        <div class="search-history" v-if="!query">
+        <div class="search-history" v-if="!query" ref="shistory">
             <div class="search-title">
               <h1 class="title">搜索历史</h1>
               <span class="icon el-icon-delete" @click="openConfirm"></span>
@@ -22,8 +22,8 @@
       </div>
     </MScroll>
 
-    <div v-show="query" class="suggest-container">
-      <Suggest :query="query" @beforeScroll ='blurInput' @saveHistory='saveHistory'></Suggest>
+    <div v-show="query" class="suggest-container" ref="sugContainer">
+      <Suggest :query="query" @beforeScroll ='blurInput' @saveHistory='saveHistory' ref="suggest"></Suggest>
     </div>
     <div class="ConfirmBox">
       <ConfirmBox :text ='confirmText' ref="confirm" @clearHistory='clearHistory'></ConfirmBox>
@@ -40,20 +40,28 @@ import Suggest from '@/components/base/suggest/suggest'
 import searchList from '@/components/search/search-list'
 import MScroll from "@/components/base/scroll/iscroll2"
 import {mapActions,mapGetters} from 'vuex'
+import {playListMinxin} from 'common/js/minxin'
 export default {
   data () {
     return {
       hotkey: [],
       query: '',
-      confirmText: '确定要删除历史记录吗？'
+      confirmText: '确定要删除历史记录吗？',
+      searchListflag: false   //底部适配flag
     }
   },
+  mixins:[playListMinxin],
   created() {
     this.getHotKey();
   },
+  activated() {
+    // console.log('activated')
+    this.setInput('')
+  },
   computed: {
     ...mapGetters([
-      'searchHistory'
+      'searchHistory',
+      'clicked'
     ]),
     shortcut() {
       return this.hotkey.concat(this.searchHistory)
@@ -65,6 +73,17 @@ export default {
       'deleteSearchHistory',
       'clearSearchHistory'
     ]),
+    handlePlayList(list) {
+      let bottom = list.length>0 ? '80px' : '';
+      setTimeout(() => {
+        if(this.clicked) {
+          if(this.$refs.searchScroll!=undefined) {
+            this.$refs.searchScroll.$el.style.bottom = bottom;
+            this.$refs.searchScroll.refresh();
+          }
+        }
+      },1001)
+    },
     getHotKey() {
       let url ='http://localhost:8888/search/getHotKey';
       this.$http.jsonp(url)
@@ -89,10 +108,10 @@ export default {
       this.$refs.searchbox.blur()
     },
     saveHistory(name) {  //存储搜索词
-      // console.log('saveHistory')
+
       this.setQuery(name)
       this.saveSearchHistory(this.query);
-      // console.log( this.searchHistory)
+      this.setQuery('')  //储存完后再次清空搜索框
     },
 
     setQuery(item) {
@@ -107,6 +126,22 @@ export default {
     },
     openConfirm() {
       this.$refs.confirm.setDialogVisible(true);
+    }
+  },
+  watch: {
+    query(newQuery) {  //suggest适配底部
+      if(this.searchListflag == true) {
+        return
+      }
+      let bottom = '80px';
+      if(this.clicked && !this.searchListflag) {
+        if(this.$refs.sugContainer!=undefined) {
+          this.$refs.sugContainer.style.bottom = bottom;
+          this.$refs.suggest.refresh();
+        }
+        console.log('fff')
+        this.searchListflag = true
+      }
     }
   },
   components: {
@@ -156,7 +191,13 @@ export default {
   clear: both;
 }
 .suggest-container {
-  height: 91%;
+  position: fixed;
+  width: 100%;
+  top: 150px;
+  bottom: 0;
+  /* height: 90%; */
+  overflow: hidden;
+  /* height: 91%; */
 }
 
 .search-history .search-title {
@@ -176,7 +217,11 @@ export default {
 }
 
 .searchScroll {
-  height: 90%;
+  position: fixed;
+  width: 100%;
+  top: 150px;
+  bottom: 0;
+  /* height: 90%; */
   overflow: hidden;
 }
 </style>

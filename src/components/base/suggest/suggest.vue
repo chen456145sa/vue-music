@@ -66,7 +66,8 @@ export default {
         'insertSong'
     ]),
     ...mapMutations({
-        setSinger: 'SET_SINGER'
+        setSinger: 'SET_SINGER',
+        setClicked: 'SET_CLICK_FLAG'
     }),
     search(newQuery, page, perpage) {
         if(!newQuery) {
@@ -140,8 +141,8 @@ export default {
             }else {
                 this.hasmore =true;
             } 
-            console.log(res)
-            console.log(this.results.song)
+            // console.log(res)
+            // console.log(this.results.song)
         })
         .catch(err => {
             console.log(err);
@@ -162,17 +163,20 @@ export default {
         this.setHistory(singer.singer_name);
     },
     selectSong(song){   //设置播放列表 打开播放器
-        console.log('下面是歌:')
-        console.log(song)
-        this.setHistory(song.song_name);
 
-        this.insertSong(song); 
+        this.setHistory(song.song_name);  //保持历史
+        this.setClicked(true)
+        this.insertSong(song);
+
     },
     listbeforeScroll() {  //滚动之前收起模拟键盘
         this.$emit('beforeScroll')
     },
     setHistory(name) { //派发事件
         this.$emit('saveHistory',name)
+    },
+    refresh() {
+        this.$refs.suggestScroll.refresh()
     }
       
   },

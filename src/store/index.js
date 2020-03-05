@@ -105,7 +105,7 @@ const actions={
 		let playList = state.playList.slice(0);
 		let sequenceList = state.sequenceList.slice(0);
 		let currentIndex = state.currentIndex;
-		console.log(playList)
+		// console.log(playList)
 		if(playList.length>0) {  //有播放列表时
 			let currentSong = playList[currentIndex]
 			let fpindex = findIndex(playList, song);
@@ -132,7 +132,7 @@ const actions={
 		}
 		commit(types.SET_PLAYING_STATE,true);
 		commit(types.SET_SEQUENCE_LIST,playList);
-		console.log(state.sequenceList)
+		// console.log(state.sequenceList)
 	},
 	saveSearchHistory({commit},query) {
 		if(!query) {

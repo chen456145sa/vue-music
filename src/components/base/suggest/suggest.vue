@@ -176,7 +176,9 @@ export default {
         this.$emit('saveHistory',name)
     },
     refresh() {
-        this.$refs.suggestScroll.refresh()
+        if(this.$refs.suggestScroll) {
+           this.$refs.suggestScroll.refresh() 
+        } 
     }
       
   },

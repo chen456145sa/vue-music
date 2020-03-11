@@ -89,6 +89,12 @@ export default {
         })
         return
       }
+
+
+
+
+
+      
       let url ='http://localhost:8888/singer/getSongListbyId/'+this.singer.id;
       this.$http.jsonp(url)
       .then(result => {

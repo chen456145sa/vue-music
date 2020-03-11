@@ -87,11 +87,12 @@
               <progressCircle class="progressCircle" :duration='duration' :currentTime='currentTime'></progressCircle>
             </div>
           </div>
-          <div class="control">
+          <div class="control" @click.stop="showPlayList">
             <i class="icon-playlist el-icon-s-fold"></i>
           </div>
         </div>
       </transition>
+      <PlayList ref="PlayList"></PlayList>
       <audio :src ="currentSong.song_url" ref="audio" 
       @canplay="ready" @error="error" @timeupdate="updateTime" @ended="ended"></audio>
   </div>
@@ -105,6 +106,7 @@ import {playMode} from 'common/js/config.js'
 import {shuffle} from 'common/js/util.js'
  import Lyric from 'lyric-parser'
  import Scroll from '@/components/base/scroll/iscroll2'
+ import PlayList from '@/components/player/playList'
 
 export default {
   data() {
@@ -122,7 +124,8 @@ export default {
   components: {
     progressBar,
     progressCircle,
-    Scroll
+    Scroll,
+    PlayList
   },
   mounted() {
     
@@ -363,6 +366,9 @@ export default {
       this.$refs.middleL.style.opacity = opacity;
       this.$refs.middleL.style['transitionDuration'] = '300ms'
       this.touch.initated = false;
+    },
+    showPlayList() {
+      this.$refs.PlayList.show();
     }
     
    

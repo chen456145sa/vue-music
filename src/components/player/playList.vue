@@ -7,7 +7,7 @@
             <span class="modeText" v-html="modecls">顺序模式</span>
             <span class="clear"><i class="el-icon-delete icon"></i></span>
         </div>
-        <Scroll class="list-content" ref="listScroll">
+        <Scroll class="list-content" ref="listScroll" :probeType=3>
             <ul ref="liList">
                 <li class="item" v-for="(item,k) in playList" :key="k" @click.stop="selectItem(k)" >
                     <span class="name" :class="currentIndex==k? 'current' : ''">{{item.song_name}}</span>
@@ -76,9 +76,9 @@ export default {
       show() {
           this.showFlag = true;
           setTimeout(() => {
-              this.scrollToCurrent()
-            //   this.$refs.listScroll.refresh();
-          },5000)
+              this.$refs.listScroll.refresh();
+              this.scrollToCurrent(this.currentSong)
+          },1000)
           
       },
       hide() {
@@ -111,22 +111,24 @@ export default {
           this.setCurrentIndex(k);
           this.setPlayingState(true);
       },
-      scrollToCurrent() {  //将当前播放歌曲放到列表第一位
-          if(this.showFlag == false) {
-              return
-          }
+      scrollToCurrent(current) {  //将当前播放歌曲放到列表第一位
           let index = this.playList.findIndex((item)=> {
-              return item.song_id == this.currentSong.song_id
+              return item.song_id == current.song_id
           })
           console.log('index: '+index)
           console.log(this.$refs.liList)
-        //   console.log(this.$refs.listScroll)
-          this.$refs.listScroll.scrollToElement(this.$refs.liList.children[index])
+          this.$refs.listScroll.scrollToElement(this.$refs.liList.children[index],300)
       }
   },
   watch: {
-      currentSong() {
-          this.scrollToCurrent()
+      currentSong(newSong) {
+          if(!this.showFlag) {
+              return
+          }
+          
+          setTimeout(() => {
+            this.scrollToCurrent(newSong)
+          }, 20)
       }
   },
   components: {

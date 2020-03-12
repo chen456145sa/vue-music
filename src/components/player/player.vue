@@ -202,8 +202,13 @@ export default {
       if(this.playList.length == 1) { //当列表只有一首歌时
         this.loop()
       }else {
+        let index = 0;
+        if(this.mode == playMode.random) {
+          index =  Math.floor( (Math.random()*this.playList.length))
+        }else {
+          index = this.currentIndex + 1;
+        }
         
-        let index = this.currentIndex + 1;
         if(index == this.playList.length) {
           index = 0;
         }

@@ -3,54 +3,14 @@
     <div class="playList" v-show="showFlag" @click="hide">
     <div class="list-wrapper" @click.stop>
         <div class="list-top">
-            <i class="icon el-icon-set-up"></i>
-            <span class="modeText">顺序模式</span>
+            <i class="icon el-icon-set-up" @click.stop="changeMode"></i>
+            <span class="modeText" v-html="modecls">顺序模式</span>
             <span class="clear"><i class="el-icon-delete icon"></i></span>
         </div>
-        <Scroll class="list-content">
-            <ul>
-                <li class="item">
-                    <span class="name">name</span>
-                    <span class="like"><i class="el-icon-star-off"></i></span>
-                    <span class="delete"><i class="el-icon-close"></i></span>
-                </li>
-                <li class="item">
-                    <span class="name">name</span>
-                    <span class="like"><i class="el-icon-star-off"></i></span>
-                    <span class="delete"><i class="el-icon-close"></i></span>
-                </li>
-                <li class="item">
-                    <span class="name">name</span>
-                    <span class="like"><i class="el-icon-star-off"></i></span>
-                    <span class="delete"><i class="el-icon-close"></i></span>
-                </li>
-                 <li class="item">
-                    <span class="name">name</span>
-                    <span class="like"><i class="el-icon-star-off"></i></span>
-                    <span class="delete"><i class="el-icon-close"></i></span>
-                </li>
-                <li class="item">
-                    <span class="name">name</span>
-                    <span class="like"><i class="el-icon-star-off"></i></span>
-                    <span class="delete"><i class="el-icon-close"></i></span>
-                </li>
-                <li class="item">
-                    <span class="name">name</span>
-                    <span class="like"><i class="el-icon-star-off"></i></span>
-                    <span class="delete"><i class="el-icon-close"></i></span>
-                </li>
-                 <li class="item">
-                    <span class="name">name</span>
-                    <span class="like"><i class="el-icon-star-off"></i></span>
-                    <span class="delete"><i class="el-icon-close"></i></span>
-                </li>
-                <li class="item">
-                    <span class="name">name</span>
-                    <span class="like"><i class="el-icon-star-off"></i></span>
-                    <span class="delete"><i class="el-icon-close"></i></span>
-                </li>
-                <li class="item">
-                    <span class="name">name</span>
+        <Scroll class="list-content" ref="listScroll">
+            <ul ref="liList">
+                <li class="item" v-for="(item,k) in playList" :key="k" @click.stop="selectItem(k)" >
+                    <span class="name" :class="currentIndex==k? 'current' : ''">{{item.song_name}}</span>
                     <span class="like"><i class="el-icon-star-off"></i></span>
                     <span class="delete"><i class="el-icon-close"></i></span>
                 </li>
@@ -72,6 +32,9 @@
 
 <script>
 import Scroll from '@/components/base/scroll/iscroll2'
+import {mapGetters,mapMutations} from 'vuex'
+import {playMode} from 'common/js/config.js'
+import {shuffle} from 'common/js/util.js'
 export default {
   props: {
       text: {
@@ -84,15 +47,86 @@ export default {
           showFlag: false
       }
   },
-  mounted() {
-
+  computed: {
+      ...mapGetters([
+          'sequenceList',
+          'mode',
+          'currentIndex',
+          'playList',
+          'currentSong',
+          'playing'
+      ]),
+      modecls() {
+          if(this.mode == 0) {
+                return '顺序模式'
+          }
+          if(this.mode == 1) {
+                return '循环模式'
+          }
+          return '随机模式'
+      }
   },
   methods: {
+      ...mapMutations({
+          setPlayMode: 'SET_PLAY_MODE',
+          setCurrentIndex: 'SET_CURRENT_INDEX',
+          setPlayList: 'SET_PLAYLIST',
+          setPlayingState: 'SET_PLAYING_STATE'
+      }),
       show() {
           this.showFlag = true;
+          setTimeout(() => {
+              this.scrollToCurrent()
+            //   this.$refs.listScroll.refresh();
+          },5000)
+          
       },
       hide() {
           this.showFlag = false;
+        //   this.$refs.listScroll.scrollTo(0,0,0)
+      },
+      changeMode() {  //改变模式
+            const mode = (this.mode + 1)%3;
+            this.setPlayMode(mode);
+            console.log(mode)
+            let list = null ;
+
+            if(mode == playMode.random) {
+                console.log('随机模式')
+                list = shuffle(this.sequenceList);   
+            }else {
+                list = this.sequenceList;
+            }
+            this.resetCurrentIndex(list)
+            // console.log('index:'+this.currentIndex)
+            this.setPlayList(list);
+      },
+      resetCurrentIndex(list) {  //随机模式重新设置index
+            let index = list.findIndex((item) => {
+                return item.song_id === this.currentSong.song_id
+            })
+            this.setCurrentIndex(index)
+      },
+      selectItem(k) {  //设置歌曲
+          this.setCurrentIndex(k);
+          this.setPlayingState(true);
+      },
+      scrollToCurrent() {  //将当前播放歌曲放到列表第一位
+          if(this.showFlag == false) {
+              return
+          }
+          let index = this.playList.findIndex((item)=> {
+              return item.song_id == this.currentSong.song_id
+          })
+          console.log('index: '+index)
+          console.log(this.$refs.liList)
+        //   console.log(this.$refs.listScroll)
+          this.$refs.listScroll.scrollToElement(this.$refs.liList.children[index])
+      }
+  },
+  watch: {
+      currentSong() {
+          this.scrollToCurrent()
       }
   },
   components: {
@@ -102,6 +136,9 @@ export default {
 </script>
 
 <style scoped>
+.current {
+    color: rgb(28, 166, 230);
+}
 .playList {
     position: fixed;
     left: 0;

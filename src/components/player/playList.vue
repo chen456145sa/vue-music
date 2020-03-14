@@ -1,50 +1,48 @@
 <template>
 <transition name='list'>
     <div class="playList" v-show="showFlag" @click="hide">
-    <div class="list-wrapper" @click.stop>
-        <div class="list-top">
-            <i class="icon el-icon-set-up" @click.stop="changeMode"></i>
-            <span class="modeText" v-html="modecls">顺序模式</span>
-            <span class="clear"><i class="el-icon-delete icon"></i></span>
-        </div>
-        <Scroll class="list-content" ref="listScroll" :probeType=3>
-            <ul ref="liList">
-                <li class="item" v-for="(item,k) in playList" :key="k" @click.stop="selectItem(k)" >
-                    <span class="name" :class="currentIndex==k? 'current' : ''">{{item.song_name}}</span>
-                    <span class="like"><i class="el-icon-star-off"></i></span>
-                    <span class="delete"><i class="el-icon-close"></i></span>
-                </li>
-            </ul>
-        </Scroll>
-        <div class="list-add">
-            <div class="add">
-                <i class="el-icon-plus"></i>
-                <span class="text">添加歌曲到队列</span>
+        <div class="list-wrapper" @click.stop>
+            <div class="list-top">
+                <i class="icon el-icon-set-up" @click.stop="changeMode"></i>
+                <span class="modeText" v-html="modecls">顺序模式</span>
+                <span class="clear" @click.stop="openConfirm"><i class="el-icon-delete icon"></i></span>
+            </div>
+            <Scroll class="list-content" ref="listScroll" :probeType=3>
+                <ul ref="liList">
+                    <li class="item" v-for="(item,k) in playList" :key="k" @click.stop="selectItem(k)" >
+                        <span class="name" :class="currentIndex==k? 'current' : ''">{{item.song_name}}</span>
+                        <span class="like"><i class="el-icon-star-off"></i></span>
+                        <span class="delete"><i class="el-icon-close" @click.stop="deleteItem(k)"></i></span>
+                    </li>
+                </ul>
+            </Scroll>
+            <div class="list-add">
+                <div class="add">
+                    <i class="el-icon-plus"></i>
+                    <span class="text">添加歌曲到队列</span>
+                </div>
+            </div>
+            <div class="list-close" @click.stop="hide">
+                <span>关闭</span>
             </div>
         </div>
-        <div class="list-close" @click.stop="hide">
-            <span>关闭</span>
-        </div>
-    </div>
+        <Confirm :text='text' :callback='callback' ref="confirm" @clearPlayList='clearList'></Confirm>
     </div>
 </transition>
 </template>
 
 <script>
 import Scroll from '@/components/base/scroll/iscroll2'
-import {mapGetters,mapMutations} from 'vuex'
+import Confirm from '@/components/base/confirm/confirm'
+import {mapGetters,mapMutations,mapActions} from 'vuex'
 import {playMode} from 'common/js/config.js'
 import {shuffle} from 'common/js/util.js'
 export default {
-  props: {
-      text: {
-          type: String,
-          default: ''
-      }
-  },
   data() {
       return {
-          showFlag: false
+          showFlag: false,
+          text: '确定要删除列表吗？',
+          callback: 'clearList'
       }
   },
   computed: {
@@ -67,6 +65,10 @@ export default {
       }
   },
   methods: {
+      ...mapActions([
+          'deleteListItem',
+          'deleteList'
+      ]),
       ...mapMutations({
           setPlayMode: 'SET_PLAY_MODE',
           setCurrentIndex: 'SET_CURRENT_INDEX',
@@ -115,10 +117,21 @@ export default {
           let index = this.playList.findIndex((item)=> {
               return item.song_id == current.song_id
           })
-          console.log('index: '+index)
-          console.log(this.$refs.liList)
+        //   console.log('index: '+index)
+        //   console.log(this.$refs.liList)
           this.$refs.listScroll.scrollToElement(this.$refs.liList.children[index],300)
+      },
+      deleteItem(index) {
+          this.deleteListItem(index)
+      },
+      openConfirm() {
+          this.$refs.confirm.setDialogVisible(true)
+      },
+      clearList() {
+          console.log('clearList')
+          this.deleteList()
       }
+
   },
   watch: {
       currentSong(newSong) {
@@ -132,7 +145,8 @@ export default {
       }
   },
   components: {
-      Scroll
+      Scroll,
+      Confirm
   }
 }
 </script>

@@ -379,9 +379,12 @@ export default {
    
   },
   watch: {
-    currentSong(oldSong, newSong) {
-      console.log(oldSong)
+    currentSong(oldSong, newSong) {  //参数反了
+      // console.log(oldSong)
       // console.log(newSong)
+      if(!oldSong) {
+        return
+      }
       if(this.currentLyric) {
         this.currentLyric.stop();
       }

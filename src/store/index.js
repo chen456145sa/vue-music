@@ -152,6 +152,29 @@ const actions={
 	},
 	clearSearchHistory({commit}) {
 		commit(types.SET_SEARCH_HISTORY,clearSearch())
+	},
+	deleteListItem({commit,state},index) {
+		//3种情况
+		let playList = state.playList.slice(0);
+		playList.splice(index,1);
+		if(index < state.currentIndex) {
+			commit(types.SET_CURRENT_INDEX,state.currentIndex-1);
+		}
+		if(index == state.currentIndex) {
+			commit(types.SET_PLAYING_STATE,true);
+		}
+		commit(types.SET_SEQUENCE_LIST,playList);
+		commit(types.SET_PLAYLIST,playList);
+		
+	},
+	deleteList({commit,state}) {
+		commit(types.SET_PLAY_MODE,playMode.sequence);
+		commit(types.SET_PLAYING_STATE,false);
+		commit(types.SET_FULL_SCREEN,false);
+		commit(types.SET_SEQUENCE_LIST,[]);
+		commit(types.SET_PLAYLIST,[]);
+		commit(types.SET_CURRENT_INDEX,0);
+		commit(types.SET_SINGER,{});
 	}
 }
 

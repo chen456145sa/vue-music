@@ -9,7 +9,7 @@
     <span>{{text}}</span>
     <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="clearHistory">确 定</el-button>
+        <el-button type="primary" @click="doMethod(callback)">确 定</el-button>
     </span>
     </el-dialog>
   </div>
@@ -26,6 +26,10 @@ export default {
       text: {
           type: String,
           default: ''
+      },
+      callback: {
+          type: String,
+          default: ''
       }
   },
   data() {
@@ -40,9 +44,18 @@ export default {
       setDialogVisible(val) {
           this.dialogVisible = val;
       },
-      clearHistory() {
-           this.dialogVisible = false;
-           this.$emit('clearHistory')
+      clearHistory(obj) {
+          obj.dialogVisible = false;
+          obj.$emit('clearHistory')
+      },
+      clearList(obj) {
+          obj.dialogVisible = false;
+          obj.$emit('clearPlayList')
+      },
+      doMethod(fn) {  //执行方法
+        let _self = this;
+        let methods = this.$options.methods
+        methods[fn](_self)
       }
   }
 }

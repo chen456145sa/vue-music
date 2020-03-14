@@ -26,7 +26,7 @@
       <Suggest :query="query" @beforeScroll ='blurInput' @saveHistory='saveHistory' ref="suggest"></Suggest>
     </div>
     <div class="ConfirmBox">
-      <ConfirmBox :text ='confirmText' ref="confirm" @clearHistory='clearHistory'></ConfirmBox>
+      <ConfirmBox :text ='confirmText' :callback='callback' ref="confirm" @clearHistory='clearHistory'></ConfirmBox>
     </div>
     <router-view></router-view>
 
@@ -44,6 +44,7 @@ import {playListMinxin} from 'common/js/minxin'
 export default {
   data () {
     return {
+      callback: 'clearHistory',
       hotkey: [],
       query: '',
       confirmText: '确定要删除历史记录吗？',

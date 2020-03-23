@@ -12,6 +12,9 @@
     <router-link tag="div" class="tab-item" to='/search'>
       <span class="tab-link">搜索</span>
     </router-link>
+    <router-link tag="div" class="tab-item" to='/collection'>
+      <span class="tab-link">收藏</span>
+    </router-link>
   </div>
 </template>
 

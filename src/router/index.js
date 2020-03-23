@@ -9,6 +9,7 @@ import Search from '@/components/search/search'
 import Singer from '@/components/singer/singer'
 import SingerDetail from '@/components/singer/singerDetail'
 import Disc from '@/components/disc/disc'
+import Collection from '@/components/collection/collection'
 Vue.use(Router)
 //vue-router3.0错误解决
 const routerPush = Router.prototype.push  
@@ -60,6 +61,10 @@ export default new Router({
           component: SingerDetail
         }
       ]
-    }
+    },
+    {
+      path: '/collection',
+      component: Collection
+    },
   ]
 })

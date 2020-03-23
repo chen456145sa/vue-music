@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import {mapGetters, mapMutations} from 'vuex'
+import {mapGetters, mapActions,mapMutations} from 'vuex'
 import progressBar from '@/components/base/progress-bar/progress-bar'
 import progressCircle from '@/components/base/progress-bar/progress-circle'
 import {playMode} from 'common/js/config.js'
@@ -153,6 +153,9 @@ export default {
     this.touch = {};
   },
   methods: {
+    // ...mapActions([
+    //       'deleteList'
+    //   ]),
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
@@ -266,7 +269,7 @@ export default {
         this.togglePlaying()
       }
       if(this.currentLyric) {
-        this.currentLyric.seek(val * 1000);
+        this.currentLyric.seek(val * 1000); //移动到当前时间歌词
       }
     },
     changeMode() { //改变mode
@@ -311,15 +314,18 @@ export default {
     },
     handler({lineNum, txt}) {  //play()时执行handler 回调函数
       // console.log('lineNum:'+lineNum)
-      this.currentNum = lineNum;
-      if(lineNum >=5) {
-        let tolyric = this.$refs.lyricline[lineNum - 5];
-        this.$refs.lyricScroll.scrollToElement(tolyric, 1000)
-      }else {
-        this.$refs.lyricScroll.scrollToElement(this.$refs.lyricline[0], 1000)
+      if(this.currentLyric) {
+          this.currentNum = lineNum;
+          if(lineNum >=5) {
+            let tolyric = this.$refs.lyricline[lineNum - 5];
+            this.$refs.lyricScroll.scrollToElement(tolyric, 1000)
+          }else {
+            this.$refs.lyricScroll.scrollToElement(this.$refs.lyricline[0], 1000)
+          }
+          // console.log(this.playingLyric)
+          this.playingLyric = txt;
       }
-      // console.log(this.playingLyric)
-      this.playingLyric = txt;
+      
     },
     midTouchStart(e) {
       // console.log(e)
@@ -379,10 +385,15 @@ export default {
    
   },
   watch: {
-    currentSong(oldSong, newSong) {  //参数反了
-      // console.log(oldSong)
-      // console.log(newSong)
-      if(!oldSong) {
+    currentSong(newSong,oldSong) {  
+      console.log(newSong)
+      console.log(oldSong)
+      if(newSong == undefined) {
+        //歌词对象重置
+        this.currentLyric = null;
+        this.hasLyric = false;
+        this.playingLyric = '';
+        this.currentNum = 0;
         return
       }
       if(this.currentLyric) {
@@ -392,10 +403,10 @@ export default {
       setTimeout(()=>{
         this.duration = this.$refs.audio.duration; //获取时长
       },200)
-      if(!newSong) {
+      if(!oldSong) {
         return
       }
-      if(newSong && newSong.song_id == oldSong.song_id) {
+      if(oldSong && oldSong.song_id == newSong.song_id) {
         this.songReady = true;
         return
       }
@@ -410,13 +421,22 @@ export default {
         audio = this.$refs.audio;
       },200)
       setTimeout(()=> {
-        newPlaying ? audio.play() : audio.pause();
+        if(audio) {
+          newPlaying ? audio.play() : audio.pause();
+        }
       },300)
      
     },
     currentIndex(newIndex) {
       console.log("newIndex:"+newIndex)
     }
+    // playList(newPlayList) {
+    //   if(!newPlayList.length) {
+    //     console.log('列表为空')
+    //     // this.deleteList()
+    //   }
+    // }
+
     
   }
 

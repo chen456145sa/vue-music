@@ -8,6 +8,7 @@
           <a href="javascript:;" class="randomBtn" ref="randomBtn" @click.stop.prevent="randPlay">随机播放</a>
         </div>
       </div>
+
       <div class="bg-layer" ref="layer"></div>
       <MScroll :arrayData = "songList" :probeType =3 :listenScroll=true 
       class="songscroll" ref="songscroll" @scroll="scroll" v-if="songList.length>0">
@@ -125,8 +126,8 @@ export default {
       
       
       if(newY <= 0) {  //移动遮罩
-        this.$refs.layer.style['transform'] = `translateY(${translateY}px)`;
-        this.$refs.layer.style['webkitTransform'] = `translateY(${translateY}px)`;
+        this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`;
+        this.$refs.layer.style['webkitTransform'] = `translate3d(0,${translateY}px,0)`;
         //通过设置背景图zindex 和 高度 实现顶部遮挡
         if(newY < this.maxHeight) {
           zIndex = 10;

@@ -78,8 +78,10 @@ export default {
       show() {
           this.showFlag = true;
           setTimeout(() => {
-              this.$refs.listScroll.refresh();
-              this.scrollToCurrent(this.currentSong)
+              if(this.$refs.listScroll) {
+                  this.$refs.listScroll.refresh();
+                  this.scrollToCurrent(this.currentSong)
+              }
           },1000)
           
       },

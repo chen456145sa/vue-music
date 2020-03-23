@@ -10,7 +10,7 @@
 export default {
   computed: {
       percent() {
-          return (this.currentTime / this.duration)*100
+          return (this.currentTime / this.duration)*100 || 0
       }
   },
   props: {

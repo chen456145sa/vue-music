@@ -6,6 +6,7 @@
   如果键值发生冲突, 则会使用组件的键值对（组件优先）
 */
 import {mapGetters} from 'vuex'
+import {playMode} from 'common/js/config.js'
 
 export const playListMinxin = {
     mounted() {  //会混入到组件中 优先与组件执行
@@ -28,5 +29,16 @@ export const playListMinxin = {
         playList(newVal) {
             this.handlePlayList(newVal)
         } 
+    }
+}
+
+export const playModeMinxin = {
+    computed: {
+        ...mapGetters([
+            'mode'
+        ]),
+        iconMode() {
+            return this.mode == playMode.sequence? 'icon-equalizer' : this.mode == playMode.loop? 'icon-loop' :'icon-shuffle'
+        }
     }
 }

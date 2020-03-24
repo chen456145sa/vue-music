@@ -51,9 +51,10 @@
               </div>
               <span class="time time-r">{{formatTime(duration)}}</span>
             </div>
+
             <div class="operators">
               <div class="icon i-left" @click="changeMode">
-                <i class="icon-sequence el-icon-set-up"></i>
+                <i :class="iconMode"></i>
               </div>
               <div class="icon i-left">
                 <i class="el-icon-d-arrow-left" @click="prev"></i>
@@ -65,7 +66,7 @@
                 <i class="el-icon-d-arrow-right" @click="next"></i>
               </div>
               <div class="icon i-right">
-                <i class="icon icon-not-favorite el-icon-star-off"></i>
+                <i class="icon  el-icon-star-off"></i>
               </div>
             </div>
           </div>
@@ -88,7 +89,7 @@
             </div>
           </div>
           <div class="control" @click.stop="showPlayList">
-            <i class="icon-playlist el-icon-s-fold"></i>
+            <i class="my-icon-playlist el-icon-s-fold"></i>
           </div>
         </div>
       </transition>
@@ -104,11 +105,13 @@ import progressBar from '@/components/base/progress-bar/progress-bar'
 import progressCircle from '@/components/base/progress-bar/progress-circle'
 import {playMode} from 'common/js/config.js'
 import {shuffle} from 'common/js/util.js'
- import Lyric from 'lyric-parser'
- import Scroll from '@/components/base/scroll/iscroll2'
- import PlayList from '@/components/player/playList'
+import Lyric from 'lyric-parser'
+import Scroll from '@/components/base/scroll/iscroll2'
+import PlayList from '@/components/player/playList'
+import {playModeMinxin} from 'common/js/minxin.js'
 
 export default {
+  mixins: [playModeMinxin],
   data() {
     return {
       songReady: false,
@@ -396,6 +399,10 @@ export default {
         this.currentNum = 0;
         return
       }
+      if(oldSong && oldSong.song_id == newSong.song_id) {
+        this.songReady = true;
+        return
+      }
       if(this.currentLyric) {
         this.currentLyric.stop();
       }
@@ -403,13 +410,10 @@ export default {
       setTimeout(()=>{
         this.duration = this.$refs.audio.duration; //获取时长
       },200)
-      if(!oldSong) {
-        return
-      }
-      if(oldSong && oldSong.song_id == newSong.song_id) {
-        this.songReady = true;
-        return
-      }
+      // if(!oldSong) {
+      //   return
+      // }
+      
       this.$nextTick(()=> {
         this.$refs.audio.play();  //歌曲改变时播放
       })
@@ -584,6 +588,9 @@ export default {
 .icon ,.i-right {
   text-align: left;
 }
+.icon-loop,.icon-shuffle{
+  /* font-size: 28px; */
+}
 .progress-wrapper {
   display: flex;
   align-items: center;
@@ -705,7 +712,7 @@ export default {
   transform: translate(-50%,50%);
  
 }
-.control .icon-playlist {
+.control .my-icon-playlist {
   font-size: 30px;
 }
 .control .control-wrapper {

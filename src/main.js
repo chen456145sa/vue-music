@@ -10,6 +10,8 @@ import './common/css/border.css'
 import 'element-ui/lib/theme-chalk/index.css';
 import { Slider,Progress,Card,Input,Dialog,Button} from 'element-ui';
 
+import './common/css/style.css'
+
 import fastclick from 'fastclick'
 import VueResource from 'vue-resource'
 

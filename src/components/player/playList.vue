@@ -3,7 +3,7 @@
     <div class="playList" v-show="showFlag" @click="hide">
         <div class="list-wrapper" @click.stop>
             <div class="list-top">
-                <i class="icon el-icon-set-up" @click.stop="changeMode"></i>
+                <i class="icon" :class="iconMode" @click.stop="changeMode"></i>
                 <span class="modeText" v-html="modecls">顺序模式</span>
                 <span class="clear" @click.stop="openConfirm"><i class="el-icon-delete icon"></i></span>
             </div>
@@ -37,7 +37,9 @@ import Confirm from '@/components/base/confirm/confirm'
 import {mapGetters,mapMutations,mapActions} from 'vuex'
 import {playMode} from 'common/js/config.js'
 import {shuffle} from 'common/js/util.js'
+import {playModeMinxin} from 'common/js/minxin.js'
 export default {
+  mixins: [playModeMinxin],
   data() {
       return {
           showFlag: false,

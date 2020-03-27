@@ -5,8 +5,9 @@
   4-如果minxins对象的选项为对象(如methods, directives,components), 则会合并为同意对象, 
   如果键值发生冲突, 则会使用组件的键值对（组件优先）
 */
-import {mapGetters} from 'vuex'
+import {mapGetters,mapActions} from 'vuex'
 import {playMode} from 'common/js/config.js'
+import {saveStorage,loadStorage,deleteStorage} from 'common/js/cache.js'
 
 export const playListMinxin = {
     mounted() {  //会混入到组件中 优先与组件执行
@@ -33,12 +34,29 @@ export const playListMinxin = {
 }
 
 export const playModeMinxin = {
+
     computed: {
         ...mapGetters([
-            'mode'
+            'mode',
+            'favoriteList'
         ]),
         iconMode() {
             return this.mode == playMode.sequence? 'icon-equalizer' : this.mode == playMode.loop? 'icon-loop' :'icon-shuffle'
+        },
+        collectCls() {
+            // let favourArr = loadStorage('favourate')
+            for(let i =0;i<this.favoriteList.length;i++) {
+              if(this.favoriteList[i].name == this.currentSong.song_name) {
+                return 'el-icon-star-on'
+              }
+            }
+            return 'el-icon-star-off'
         }
+    },
+    methods: {
+        ...mapActions([
+            'saveFavorite',
+            'deleteFavorite'
+        ])
     }
 }

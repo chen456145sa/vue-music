@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import * as types from './types'
 import {playMode} from 'common/js/config.js'
 import {shuffle,findIndex} from 'common/js/util.js'
-import {saveSearch,loadSearch,deleteSearch,clearSearch} from 'common/js/cache.js'
+import {saveSearch,loadSearch,deleteSearch,clearSearch,saveStorage,loadStorage,deleteStorage,clearStorage} from 'common/js/cache.js'
 Vue.use(Vuex);
 
 //获得本地存储购物车cart数据
@@ -21,7 +21,8 @@ var state={
 	currentIndex: -1,
 	cateSongs: {},
 	clicked: false,
-	searchHistory: loadSearch()
+	searchHistory: loadSearch(),
+	favoriteList: []
 }
 
 //定义getters 访问数据的第二种方式 （不可以在这里改变数据）可以认为是 store 的计算属性
@@ -70,6 +71,9 @@ var getters={
 	},
 	currentSong: function(state) {
         return state.playList[state.currentIndex]
+	},
+	favoriteList: function(state) {
+        return state.favoriteList
 	}
 }
 
@@ -192,7 +196,26 @@ const actions={
 		commit(types.SET_PLAYLIST,[]);
 		commit(types.SET_CURRENT_INDEX,0);
 		commit(types.SET_SINGER,{});
+	},
+	saveFavorite({commit},song) { //收藏
+		if(!song) {
+			console.log('无效song')
+			return
+		}
+		let favorite = saveStorage('favourate',song)
+		commit(types.SET_FAVORITE_LIST,favorite)
+	},
+	deleteFavorite({commit},song) {
+		if(!song) {
+			console.log('无效song')
+			return
+		}
+		commit(types.SET_FAVORITE_LIST,deleteStorage('favourate',song))
+	},
+	clearFavorite({commit}) {
+		commit(types.SET_FAVORITE_LIST,clearStorage('favourate'))
 	}
+	
 }
 
 //定义mutations 处理数据的改变
@@ -213,6 +236,9 @@ const mutations={
 	},
 	[types.SET_SEARCH_HISTORY](state, history) {
         state.searchHistory = history;
+	},
+	[types.SET_FAVORITE_LIST](state, list) {
+        state.favoriteList = list;
     },
     [types.SET_PLAYING_STATE](state, flag) {
         state.playing = flag;

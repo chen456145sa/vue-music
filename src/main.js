@@ -46,6 +46,7 @@ Vue.component(Card.name, Card);
 Vue.component(Input.name, Input);
 Vue.component(Dialog.name, Dialog);
 Vue.component(Button.name, Button);
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

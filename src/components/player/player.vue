@@ -65,8 +65,8 @@
               <div class="icon i-right" >
                 <i class="el-icon-d-arrow-right" @click="next"></i>
               </div>
-              <div class="icon i-right">
-                <i class="icon  el-icon-star-off"></i>
+              <div class="icon i-right" @click="toggleCollect">
+                <i class="icon" :class="collectCls"></i>
               </div>
             </div>
           </div>
@@ -109,6 +109,7 @@ import Lyric from 'lyric-parser'
 import Scroll from '@/components/base/scroll/iscroll2'
 import PlayList from '@/components/player/playList'
 import {playModeMinxin} from 'common/js/minxin.js'
+import {saveStorage,loadStorage,deleteStorage} from 'common/js/cache.js'
 
 export default {
   mixins: [playModeMinxin],
@@ -121,7 +122,9 @@ export default {
       playingLyric: '',
       currentNum: 0,
       hasLyric: false,
-      currentShow: 'cd'
+      currentShow: 'cd',
+      favourArr: []
+      
     }
   },
   components: {
@@ -157,7 +160,8 @@ export default {
   },
   methods: {
     // ...mapActions([
-    //       'deleteList'
+    //       'saveFavorite',
+    //       'deleteFavorite'
     //   ]),
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
@@ -229,6 +233,12 @@ export default {
       this.duration = e.target.duration;
       console.log('this.duration:'+this.duration)
       this.songReady = true;
+      //存储最近播放
+      let obj = {
+        id: this.currentSong.song_id,
+        name: this.currentSong.song_name
+      }
+      saveStorage('last',obj);
     },
     error() {
       console.log('歌曲发生错误') 
@@ -381,11 +391,27 @@ export default {
       this.$refs.middleL.style['transitionDuration'] = '300ms'
       this.touch.initated = false;
     },
-    showPlayList() {
+    showPlayList() { 
       this.$refs.PlayList.show();
+    },
+    toggleCollect() { //收藏
+      // this.favoriteList = loadStorage('favourate')
+      for(let i =0;i<this.favoriteList.length;i++) {
+        if(this.favoriteList[i].name == this.currentSong.song_name) { //如果有记录 就去除收藏
+          // deleteStorage('favourate',this.favoriteList[i])
+          this.deleteFavorite(this.favoriteList[i])
+          // this.favoriteList = loadStorage('favourate')
+          return
+        }
+      }
+      let obj = {
+        id: this.currentSong.song_id,
+        name: this.currentSong.song_name
+      }
+      // saveStorage('favourate',obj)
+      this.saveFavorite(obj)
     }
     
-   
   },
   watch: {
     currentSong(newSong,oldSong) {  

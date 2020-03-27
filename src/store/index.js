@@ -22,7 +22,7 @@ var state={
 	cateSongs: {},
 	clicked: false,
 	searchHistory: loadSearch(),
-	favoriteList: []
+	favoriteList: loadStorage('favourate')
 }
 
 //定义getters 访问数据的第二种方式 （不可以在这里改变数据）可以认为是 store 的计算属性

@@ -190,6 +190,8 @@ export default {
       }
       if(this.playList.length == 1) { //当列表只有一首歌时
         this.loop()
+        this.setPlayingState(true)
+        
       }else {
 
         let index = this.currentIndex - 1;
@@ -211,6 +213,7 @@ export default {
       }
       if(this.playList.length == 1) { //当列表只有一首歌时
         this.loop()
+        this.setPlayingState(true)
       }else {
         let index = 0;
         if(this.mode == playMode.random) {

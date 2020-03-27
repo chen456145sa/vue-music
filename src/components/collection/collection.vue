@@ -21,14 +21,13 @@
 </template>
 
 <script>
-import {loadStorage} from 'common/js/cache.js'
+import {saveStorage,loadStorage,deleteStorage,clearStorage} from 'common/js/cache.js'
 import {mapGetters, mapActions,mapMutations} from 'vuex'
 export default {
  
   data() {
       return {
         lastArr: loadStorage('last'),
-        favourArr: loadStorage('favourate'),
         temp: loadStorage('last'),
         activeFlag: 1,
         song: {}
@@ -36,11 +35,12 @@ export default {
   },
   activated() {
     this.lastArr = loadStorage('last');
-    this.favourArr = loadStorage('favourate');
+    this.temp = this.lastArr;
   },
   computed: {
     ...mapGetters([
-      'favoriteList'
+      'favoriteList',
+      'currentIndex'
     ])
   },
   methods: {
@@ -50,11 +50,13 @@ export default {
     ]),
     changePane(val) {
       if(val == 1) {
+        this.lastArr = loadStorage('last');
         this.temp = this.lastArr;
         this.activeFlag = 1;
       }else {
-        this.favourArr = loadStorage('favourate');
-        this.temp = this.favourArr;
+        // this.favourArr = loadStorage('favourate');
+        // this.temp = this.favourArr;
+        this.temp = this.favoriteList;
         this.activeFlag = 2;
       }
     },
@@ -75,13 +77,35 @@ export default {
     },
     clearItem(song) {
       if(this.activeFlag == 1) {
-        console.log(1111)
+
+        this.lastArr = deleteStorage('last',song)
+        this.temp =  this.lastArr;
+
       }else {
+        
         this.deleteFavorite(song)
-        this.favourArr = loadStorage('favourate');
+        // this.favourArr = loadStorage('favourate');
+        // this.temp = this.favourArr;
+        this.temp = this.favoriteList;
       }
     }
 
+  },
+  watch: {
+    favoriteList() {
+      this.temp = this.favoriteList;
+      this.activeFlag = 2;
+    },
+    currentIndex() {
+      // console.log('11111111')
+      setTimeout(()=> {
+        this.lastArr =  loadStorage('last');
+        // console.log(this.lastArr)
+        this.temp =  this.lastArr;
+        this.activeFlag = 1;
+      },1000)
+      
+    }
   }
 }
 </script>

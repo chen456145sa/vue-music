@@ -11,7 +11,7 @@
                 <ul ref="liList">
                     <li class="item" v-for="(item,k) in playList" :key="k" @click.stop="selectItem(k)" >
                         <span class="name" :class="currentIndex==k? 'current' : ''">{{item.song_name}}</span>
-                        <span class="like"><i class="el-icon-star-off"></i></span>
+                        <span class="like" ><i :class="collectCls(item)" @click.stop="toggleCollect(item)"></i></span>
                         <span class="delete"><i class="el-icon-close" @click.stop="deleteItem(k)"></i></span>
                     </li>
                 </ul>

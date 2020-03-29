@@ -44,19 +44,44 @@ export const playModeMinxin = {
             return this.mode == playMode.sequence? 'icon-equalizer' : this.mode == playMode.loop? 'icon-loop' :'icon-shuffle'
         },
         collectCls() {
-            // let favourArr = loadStorage('favourate')
-            for(let i =0;i<this.favoriteList.length;i++) {
-              if(this.favoriteList[i].name == this.currentSong.song_name) {
-                return 'el-icon-star-on'
-              }
+            //计算属性不能传参  使用闭包传参数
+            // console.log(song)  这里为什么能拿到song 奇葩????
+            return function(song) {
+                // let favourArr = loadStorage('favourate')
+                for(let i =0;i<this.favoriteList.length;i++) {
+                    if(this.favoriteList[i].name == song.song_name) {
+                        return 'el-icon-star-on'
+                    }
+                }
+                return 'el-icon-star-off'
             }
-            return 'el-icon-star-off'
         }
+            
     },
     methods: {
         ...mapActions([
             'saveFavorite',
             'deleteFavorite'
-        ])
+        ]),
+        toggleCollect(song) { //收藏
+            if(!song) {
+                return
+            }
+            // this.favoriteList = loadStorage('favourate')
+            for(let i =0;i<this.favoriteList.length;i++) {
+              if(this.favoriteList[i].name == song.song_name) { //如果有记录 就去除收藏
+                // deleteStorage('favourate',this.favoriteList[i])
+                this.deleteFavorite(this.favoriteList[i])
+                // this.favoriteList = loadStorage('favourate')
+                return
+              }
+            }
+            let obj = {
+              id: song.song_id,
+              name: song.song_name
+            }
+            // saveStorage('favourate',obj)
+            this.saveFavorite(obj)
+          }
     }
 }

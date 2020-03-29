@@ -65,8 +65,8 @@
               <div class="icon i-right" >
                 <i class="el-icon-d-arrow-right" @click="next"></i>
               </div>
-              <div class="icon i-right" @click="toggleCollect">
-                <i class="icon" :class="collectCls"></i>
+              <div class="icon i-right" @click="toggleCollect(currentSong)">
+                <i class="icon" :class="collectCls(currentSong)"></i>
               </div>
             </div>
           </div>
@@ -396,24 +396,24 @@ export default {
     },
     showPlayList() { 
       this.$refs.PlayList.show();
-    },
-    toggleCollect() { //收藏
-      // this.favoriteList = loadStorage('favourate')
-      for(let i =0;i<this.favoriteList.length;i++) {
-        if(this.favoriteList[i].name == this.currentSong.song_name) { //如果有记录 就去除收藏
-          // deleteStorage('favourate',this.favoriteList[i])
-          this.deleteFavorite(this.favoriteList[i])
-          // this.favoriteList = loadStorage('favourate')
-          return
-        }
-      }
-      let obj = {
-        id: this.currentSong.song_id,
-        name: this.currentSong.song_name
-      }
-      // saveStorage('favourate',obj)
-      this.saveFavorite(obj)
     }
+    // toggleCollect() { //收藏
+    //   // this.favoriteList = loadStorage('favourate')
+    //   for(let i =0;i<this.favoriteList.length;i++) {
+    //     if(this.favoriteList[i].name == this.currentSong.song_name) { //如果有记录 就去除收藏
+    //       // deleteStorage('favourate',this.favoriteList[i])
+    //       this.deleteFavorite(this.favoriteList[i])
+    //       // this.favoriteList = loadStorage('favourate')
+    //       return
+    //     }
+    //   }
+    //   let obj = {
+    //     id: this.currentSong.song_id,
+    //     name: this.currentSong.song_name
+    //   }
+    //   // saveStorage('favourate',obj)
+    //   this.saveFavorite(obj)
+    // }
     
   },
   watch: {

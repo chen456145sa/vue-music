@@ -215,6 +215,9 @@ const actions={
 	clearFavorite({commit}) {
 		commit(types.SET_FAVORITE_LIST,clearStorage('favourate'))
 	}
+	// saveLoveTag({commit},tag) { //收藏
+	// 	let lovetag = saveStorage('lovetag',song)
+	// },
 	
 }
 

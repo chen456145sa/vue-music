@@ -32,7 +32,7 @@ export default {
     },
     title() {
       if(this.disc.id !== 'undefinded') {
-        return this.disc.creator.name
+        return this.disc.title
       }else {
         return ''
       }

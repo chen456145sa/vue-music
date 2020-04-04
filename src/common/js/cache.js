@@ -5,6 +5,7 @@ const SEARCH_KEY = 'history';
 const MAX_LENGTH = 12;
 const LAST_KEY = 'last'
 const FAVOURATE_KEY = 'favourate'
+const LOVETAG = 'lovetag'
 
 export function saveSearch(query) { //将搜索词写入到数组里 并缓存到本地
     let history = storage.get(SEARCH_KEY, []);

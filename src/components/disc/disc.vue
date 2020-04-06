@@ -55,11 +55,21 @@ export default {
   },
   methods: {
     getSongList() {
+
         let url ='http://localhost:8888/recommend/getRecSongsById/'+ this.$route.params.id
+        if(this.disc.rec) {
+          url = 'http://localhost:8888/recommend/getRecListSong/'+ this.$route.params.id
+        }
         this.$http.jsonp(url)
         .then(result => {
-            // console.log(result);
-            this.songs = result.body.songs    
+            console.log(result);
+            if(this.disc.rec) {
+              this.songs = result.body[0].songs
+            }else {
+              this.songs = result.body.songs  
+            }
+            
+              
         })
         .catch(err => {
             console.log(err);

@@ -1,6 +1,7 @@
 //洗牌函数
 export function shuffle(arr) {
-    let tArr = arr.slice();
+    // let tArr = arr.slice();
+    let tArr = JSON.parse(JSON.stringify(arr))
     for(let i = 0; i<tArr.length; i++){
         let randIndex = Math.floor(Math.random()*(i+1));
         let temp = tArr[i];

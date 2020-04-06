@@ -7,11 +7,11 @@
         <h1 class="list-title">歌单推荐</h1>
         <span class="change" @click="changeRec"><i class="el-icon-refresh"></i> 换一换</span>
         <ul v-if="recArray.length">
-          <li class="rec-item" v-for="(item,key) in recArray" :key="key">
+          <li class="rec-item" v-for="(item,key) in recArray" :key="key" @click="setRec(item)">
             <img v-lazy="item.img_url" alt="zjl" >
             <div>
               <h1>{{item.title}}</h1>
-              <p>{{item.dissname}}</p>
+              <!-- <p>{{item.dissname}}</p> -->
             </div>
           </li>
         </ul>
@@ -49,6 +49,7 @@ import Loading from '@/components/base/Loading/Loading'
 import {playListMinxin} from 'common/js/minxin'
 import {saveStorage,loadStorage,deleteStorage,clearStorage} from 'common/js/cache.js'
 import {mapGetters, mapMutations} from 'vuex'
+import {shuffle} from 'common/js/util.js'
 export default {
   mixins: [playListMinxin],
   data () {
@@ -81,6 +82,14 @@ export default {
       this.setDisc(item);
       // console.log(this.disc)
       this.saveTag(item)  //储存tag
+    },
+    setRec(item) {
+      this.$router.push({  
+        path: "/recommend/"+item.id
+      })
+      item.rec = true
+      this.setDisc(item);
+      console.log(item)
     },
     handlePlayList(list) { //适配底部
       let bottom = list.length>0 ? '80px' : '';
@@ -120,7 +129,7 @@ export default {
       let loveTag = loadStorage('lovetag')
       let arr = []
       let maxIndex = 0;
-      let moreTag = '';
+      let moreTag = loveTag[0].tag; //默认值
       let secondTag = '';
       //逻辑一 先找出最多出现的tag 取该tag的歌单  
       //逻辑二 随机从lovetag里取一个或多个tag 取该tag组的歌单
@@ -151,7 +160,10 @@ export default {
       }
       moreTag = arr[maxIndex].tag;
       arr.splice(maxIndex,1)
-      secondTag =  arr[Math.floor(Math.random()*arr.length)].tag 
+      if(arr.length >= 1) {
+        secondTag =  arr[Math.floor(Math.random()*arr.length)].tag 
+      }
+      
       // console.log(secondTag)
       // console.log(arr)
       // console.log(maxIndex)
@@ -159,12 +171,16 @@ export default {
       //发送请求 请求歌单
       this.searchRec('http://localhost:8888/recommend/getRecList', 3, [moreTag,secondTag])
       .then((res)=> {
-        console.log(res)
+        // console.log(res)
         if(res) {
-          this.recArray = res
+          //打乱
+          let a = shuffle(res)
+          // console.log(a)
+          this.recArray = a
+          
         }
       })
-
+      
 
     },
     searchRec(url, number, tagGroup) {
@@ -277,7 +293,8 @@ export default {
   }
   .recommend-banner ul {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-items: flex-start;
     flex-wrap: wrap;
     
   }
@@ -285,17 +302,34 @@ export default {
     box-sizing: border-box;
     background-color: rgba(235, 235, 235, 0.555);
     margin: 5px 0px;
+    margin-left: 1%;
     box-shadow: 1px 1px 1px rgb(148, 148, 148);
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
     overflow: hidden;
     text-align: left;
     width: 32%;
+
+    /* flex: 0.33; */
+  }
+  .rec-item h1 {
+    /* padding: 5px 0; */
+    padding-top: 5px;
+    margin-bottom: 5px;
+    min-height: 27px;
+    /* 多行溢出 */
+    text-overflow: -o-ellipsis-lastline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
   .rec-item img {
     border-radius: 6px;
-    min-height: 120px;
-    max-width: 120px;
+    /* min-height: 120px; */
+    /* max-width: 120px; */
+    /* width: 100%; */
     width: 100%;
     margin-bottom: 5px;
   }

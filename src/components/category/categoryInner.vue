@@ -112,6 +112,8 @@ export default {
   float: left;
   margin-bottom: 6px;
   margin-left: 1%;
+  border-radius: 5px;
+  box-shadow: 1px 1px 1px #ccc;
 }
 .image {
   width: 100%;

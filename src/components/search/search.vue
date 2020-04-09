@@ -12,7 +12,7 @@
           </ul>
         </div>
         <div class="clearfix"></div>
-        <div class="search-history" v-if="!query" ref="shistory">
+        <div class="search-history" v-if="!query&&searchHistory.length>0" ref="shistory">
             <div class="search-title">
               <h1 class="title">搜索历史</h1>
               <span class="icon el-icon-delete" @click="openConfirm"></span>

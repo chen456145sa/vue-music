@@ -17,12 +17,16 @@
         </ul>
       </div>
     </div>
+    <div>
+      <Nofind :title="title" v-show="temp.length<=0"></Nofind>
+    </div>
   </div>
 </template>
 
 <script>
 import {saveStorage,loadStorage,deleteStorage,clearStorage} from 'common/js/cache.js'
 import {mapGetters, mapActions,mapMutations} from 'vuex'
+import Nofind from '@/components/base/nofind/nofind'
 export default {
  
   data() {
@@ -30,7 +34,8 @@ export default {
         lastArr: loadStorage('last'),
         temp: loadStorage('last'),
         activeFlag: 1,
-        song: {}
+        song: {},
+        title: '暂无记录'
       }
   },
   activated() {
@@ -42,6 +47,9 @@ export default {
       'favoriteList',
       'currentIndex'
     ])
+  },
+  components: {
+    Nofind
   },
   methods: {
     ...mapActions([

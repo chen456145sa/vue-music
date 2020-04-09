@@ -1,5 +1,5 @@
 <template>
-  <div class="search-list" v-show="historyArray.length">
+  <div class="search-list" v-show="historyArray.length>0">
     <ul>
       <li class="item" v-for="(item, index) in historyArray" :key="index" @click="setInput(item)">
         <span class="query">{{item}}</span>

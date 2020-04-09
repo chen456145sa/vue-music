@@ -5,7 +5,7 @@
       <m-Swipe></m-Swipe>
       <div class="recommend-banner">
         <h1 class="list-title">歌单推荐</h1>
-        <span class="change" @click="changeRec"><i class="el-icon-refresh"></i> 换一换</span>
+        <span class="change" @click="loadRec"><i class="el-icon-refresh"></i> 换一换</span>
         <ul v-if="recArray.length">
           <li class="rec-item" v-for="(item,key) in recArray" :key="key" @click="setRec(item)">
             <img v-lazy="item.img_url" alt="zjl" >
@@ -66,6 +66,8 @@ export default {
   },
   created() {
       this.getSongList();
+      // this.changeRec();
+      this.loadRec();
       // var _self = this;
       // setTimeout(function(){
       //   _self.getSongList();
@@ -124,46 +126,77 @@ export default {
         tag: item.tag
       }
       saveStorage('lovetag',obj)
+
+      //发送数据到服务器 并储存到数据库
+      let url = 'http://localhost:8888/recommend/saveTag'
+      this.$http.jsonp(url,{params: obj})
+      .then(result => {
+          //console.log(result);
+          this.results = result.body;
+      })
+      .catch(err => {
+          console.log(err);
+      })
     },
     changeRec() {
       let loveTag = loadStorage('lovetag')
       let arr = []
       let maxIndex = 0;
-      let moreTag = loveTag[0].tag; //默认值
+      let moreTag = '';
       let secondTag = '';
-      //逻辑一 先找出最多出现的tag 取该tag的歌单  
-      //逻辑二 随机从lovetag里取一个或多个tag 取该tag组的歌单
-      for(let i =0; i<loveTag.length; i++) {
-          let flag = true;
-          let obj = {}
-          obj['id'] = loveTag[i].id;
-          obj['val'] = 1;
-          obj['tag'] =  loveTag[i].tag;
-          if(arr.length>0) {
-            for(let j =0; j<arr.length; j++) {
-              if(arr[j].tag == loveTag[i].tag) {
-                 arr[j].val +=1;
-                 flag = false
+      if(loveTag.length<=0) {
+        moreTag = 'happy'
+        this.saveTag({id:999,tag:'happy'})
+      }else {
+        moreTag = loveTag[0].tag; //默认值
+      }
+      
+      if(loveTag.length >= 2) {
+         //逻辑一 先找出最多出现的tag 取该tag的歌单  
+        //逻辑二 随机从lovetag里取一个或多个tag 取该tag组的歌单
+        for(let i =0; i<loveTag.length; i++) {
+            let flag = true;
+            let obj = {}
+            obj['id'] = loveTag[i].id;
+            obj['val'] = 1;
+            obj['tag'] =  loveTag[i].tag;
+            if(arr.length>0) {
+              for(let j =0; j<arr.length; j++) {
+                if(arr[j].tag == loveTag[i].tag) {
+                  arr[j].val +=1;
+                  flag = false
+                }
               }
             }
-          }
-          if(flag) {
-           arr.push(obj) 
-          } 
-      }
-      for(let i =0; i<arr.length-1; i++) {
-        if(arr[i+1].val<arr[i].val) {
-          maxIndex = i
-        }else {
-          maxIndex = i + 1
+            if(flag) {
+              arr.push(obj) 
+            } 
         }
+        // console.log(arr)
+        //排序 取最多的index
+        for(let i =0; i<arr.length; i++) {
+          let boo = true
+          for(let j = 0; j<arr.length-i-1; j++) {
+            if(arr[j].val<arr[j+1].val) {
+              let temp = arr[j];
+              arr[j] = arr[j+1];
+              arr[j+1] = temp;
+              boo = false;
+            }
+          }
+          if(boo) {
+            break
+          }
+        }
+        // console.log(arr)
+        // maxIndex = 0;
+        moreTag = arr[0].tag;
       }
-      moreTag = arr[maxIndex].tag;
+     
       arr.splice(maxIndex,1)
       if(arr.length >= 1) {
         secondTag =  arr[Math.floor(Math.random()*arr.length)].tag 
       }
-      
       // console.log(secondTag)
       // console.log(arr)
       // console.log(maxIndex)
@@ -180,6 +213,103 @@ export default {
           
         }
       })
+      
+
+    },
+    loadRec() {
+      
+      let maxIndex = 0;
+      let moreTag = '';
+      let secondTag = '';
+      let loveTag = [];
+      let arr = [];
+
+      let url = 'http://localhost:8888/recommend/getTag'
+      this.$http.jsonp(url)
+      .then(result => {
+          //console.log(result);
+          loveTag = result.body;
+          console.log(loveTag)
+      })
+      .catch(err => {
+          console.log(err);
+      })
+    
+      clearTimeout(timer)
+      var timer = setTimeout(()=> {
+        if(loveTag.length<=0) {
+          console.log(loveTag)
+          moreTag = 'happy'
+          this.saveTag({id:999,tag:'happy'})
+        }else {
+          moreTag = loveTag[0].tag; //默认值
+        }
+        
+        if(loveTag.length >= 2) {
+          //逻辑一 先找出最多出现的tag 取该tag的歌单  
+          //逻辑二 随机从lovetag里取一个或多个tag 取该tag组的歌单
+          for(let i =0; i<loveTag.length; i++) {
+              let flag = true;
+              let obj = {}
+              obj['id'] = loveTag[i].id;
+              obj['val'] = 1;
+              obj['tag'] =  loveTag[i].tag;
+              if(arr.length>0) {
+                for(let j =0; j<arr.length; j++) {
+                  if(arr[j].tag == loveTag[i].tag) {
+                    arr[j].val +=1;
+                    flag = false
+                  }
+                }
+              }
+              if(flag) {
+                arr.push(obj) 
+              } 
+          }
+          //排序 取最多的index
+          for(let i =0; i<arr.length; i++) {
+            let boo = true
+            for(let j = 0; j<arr.length-i-1; j++) {
+              if(arr[j].val<arr[j+1].val) {
+                let temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+                boo = false;
+              }
+            }
+            if(boo) {
+              break
+            }
+          }
+          // console.log(arr)
+          // maxIndex = 0;
+          moreTag = arr[0].tag;
+        }
+      
+        arr.splice(maxIndex,1)
+        if(arr.length >= 1) {
+          secondTag =  arr[Math.floor(Math.random()*arr.length)].tag 
+        }
+        
+        console.log(secondTag)
+        console.log(arr)
+        console.log(maxIndex)
+        console.log(moreTag)
+
+        this.searchRec('http://localhost:8888/recommend/getRecList', 3, [moreTag,secondTag])
+        .then((res)=> {
+          // console.log(res)
+          if(res) {
+            //打乱
+            let a = shuffle(res)
+            // console.log(a)
+            this.recArray = a
+            
+          }
+        })
+
+      },200)
+      
       
 
     },
@@ -203,6 +333,9 @@ export default {
         })
        
     }
+    // postTag(item) {
+
+    // }
   },
   components: {
     MSwipe,

@@ -45,10 +45,10 @@ export default {
       this.$router.push({  //编程路由
         path: "/recommend/"
       })
-      console.log(111)
+      console.log('刷新路由')
       return
     }
-    console.log(this.disc)
+    // console.log(this.disc)
   },
   components: {
     musicList
@@ -62,7 +62,7 @@ export default {
         }
         this.$http.jsonp(url)
         .then(result => {
-            console.log(result);
+            // console.log(result);
             if(this.disc.rec) {
               this.songs = result.body[0].songs
             }else {

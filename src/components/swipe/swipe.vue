@@ -176,7 +176,7 @@ export default {
 		
 	},
 	getBannerImages() {
-		this.$http.get('http://localhost:8888/recommend/getBannerImages')
+		this.$http.get(this.dataIp+'/recommend/getBannerImages')
 		.then(result => {
 				//console.log(result.body);
 				this.imagesList = result.body.message;	

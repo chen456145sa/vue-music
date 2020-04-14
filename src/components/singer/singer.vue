@@ -86,7 +86,9 @@ export default {
       console.log(this.pinyin('周'));
     },
     getSingerList() {  //获取歌手列表
-      this.$http.get('http://localhost:8888/singer/getSingerList')
+      // let url = 'http://localhost:8888/singer/getSingerList';
+      let url = this.dataIp+'/singer/getSingerList';
+      this.$http.get(url)
       .then(result => {
           //console.log(result.body);
           this.singerList = result.body.singerlist;	

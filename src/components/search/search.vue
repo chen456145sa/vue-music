@@ -86,7 +86,7 @@ export default {
       },1001)
     },
     getHotKey() {
-      let url ='http://localhost:8888/search/getHotKey';
+      let url =this.dataIp+'/search/getHotKey';
       this.$http.jsonp(url)
       .then(result => {
           //console.log(result);

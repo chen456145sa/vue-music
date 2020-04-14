@@ -73,7 +73,7 @@ export default {
     //   this.maxHeight = - this.$refs.top.clientHeight + 40;
     //   console.log( this.maxHeight)
     // },3000);
-    
+
   },
   components: {
     MScroll,
@@ -90,7 +90,7 @@ export default {
         return
       }
       
-      let url ='http://localhost:8888/singer/getSongListbyId/'+this.singer.id;
+      let url = this.dataIp+'/singer/getSongListbyId/'+this.singer.id;
       this.$http.jsonp(url)
       .then(result => {
           //console.log(result);

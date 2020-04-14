@@ -1,25 +1,29 @@
 <template>
-  <div class="collection">
-    <div class="top">
-      <div class="tab-list">
-        <span class="tab" :class="activeFlag == 1?'active':''" @click='changePane(1)'>最近播放</span>
-        <span class="tab" :class="activeFlag == 2?'active':''" @click='changePane(2)'>我的收藏</span>
-      </div>
-      
-    </div>
-    <div>
-      <div class="tab-container">
-        <ul>
-            <li v-for="(item,k) in temp" :key="k" class="item" @click.stop="playItem(item)" >
-              <span class="songName">{{item.name}}</span>
-              <span><i class="el-icon-close" @click.stop="clearItem(item)"></i></span>
-            </li>
-        </ul>
-      </div>
-    </div>
-    <div>
-      <Nofind :title="title" v-show="temp.length<=0"></Nofind>
-    </div>
+  <div class="collection" ref="collection">
+    <MScroll :arrayData='temp' ref="scroll">
+        <div class="top">
+          <div class="tab-list">
+            <span class="tab" :class="activeFlag == 1?'active':''" @click='changePane(1)'>最近播放</span>
+            <span class="tab" :class="activeFlag == 2?'active':''" @click='changePane(2)'>我的收藏</span>
+          </div>
+        </div>
+
+        <div >
+          <div class="tab-container">
+            <ul>
+                <li v-for="(item,k) in temp" :key="k" class="item" @click.stop="playItem(item)" >
+                  <span class="songName">{{item.name}}</span>
+                  <span><i class="el-icon-close" @click.stop="clearItem(item)"></i></span>
+                </li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <Nofind :title="title" v-show="temp.length<=0"></Nofind>
+        </div>
+    </MScroll>
+
   </div>
 </template>
 
@@ -27,8 +31,10 @@
 import {saveStorage,loadStorage,deleteStorage,clearStorage} from 'common/js/cache.js'
 import {mapGetters, mapActions,mapMutations} from 'vuex'
 import Nofind from '@/components/base/nofind/nofind'
+import MScroll from "@/components/base/scroll/iscroll2"
+import {playListMinxin} from 'common/js/minxin'
 export default {
- 
+  mixins:[playListMinxin],
   data() {
       return {
         lastArr: loadStorage('last'),
@@ -45,17 +51,29 @@ export default {
   computed: {
     ...mapGetters([
       'favoriteList',
-      'currentIndex'
+      'currentIndex',
+      'clicked'
     ])
   },
   components: {
-    Nofind
+    Nofind,
+    MScroll
   },
   methods: {
     ...mapActions([
       'insertSong',
       'deleteFavorite'
     ]),
+    handlePlayList(list) { //适配底部
+      let bottom = list.length>0 ? '80px' : '';
+      setTimeout(() => {
+        if(this.clicked) {
+          this.$refs.collection.style.bottom = bottom;
+          this.$refs.scroll.refresh();
+        }
+        // console.log('singerlist')
+      },1001)
+    },
     changePane(val) {
       if(val == 1) {
         this.lastArr = loadStorage('last');
@@ -70,7 +88,7 @@ export default {
     },
     playItem(item) {
       //请求歌曲信息
-      this.$http.get('http://localhost:8888/collection/'+item.id)
+      this.$http.get(this.dataIp+'/collection/'+item.id)
       .then(res => {
         this.song = res.body;
         console.log(this.song);
@@ -119,6 +137,18 @@ export default {
 </script>
 
 <style scoped>
+.collection {
+  position: fixed;
+  width: 100%;
+  top: 88px;
+  bottom: 0;
+}
+.scroll {
+  height: 100%;
+  overflow: hidden;
+}
+
+
 .top {
   padding: 10px 0;
   font-size: 16px;

@@ -79,7 +79,7 @@ export default {
             perpage: perpage,
             key: newQuery
         }
-        let url ='http://localhost:8888/search/searchList2/'
+        let url =this.dataIp+'/search/searchList2/'
         return new Promise((resolve,reject)=> {
             this.$http.jsonp(url,{params: data})
             .then(result => {

@@ -24,6 +24,7 @@ import pinyin from "chinese-to-pinyin"
 
 import store from "./store/index"
 
+//字转字母
 Vue.prototype.pinyin = pinyin;
 //console.log(pinyin)
 
@@ -38,6 +39,10 @@ Vue.use(IScrollView, IScroll)
 Vue.use(VueLazyload, {
   loading: require('common/images/load.jpg')
 })
+
+//定义全局变量
+// dataIp: 'http://192.168.43.171:8888'
+Vue.prototype.dataIp = 'http://192.168.43.171:8888';
 
 // Vue.use(ElementUI);
 Vue.component(Slider.name, Slider);

@@ -56,9 +56,9 @@ export default {
   methods: {
     getSongList() {
 
-        let url ='http://localhost:8888/recommend/getRecSongsById/'+ this.$route.params.id
+        let url =this.dataIp+'/recommend/getRecSongsById/'+ this.$route.params.id
         if(this.disc.rec) {
-          url = 'http://localhost:8888/recommend/getRecListSong/'+ this.$route.params.id
+          url = this.dataIp+'/recommend/getRecListSong/'+ this.$route.params.id
         }
         this.$http.jsonp(url)
         .then(result => {

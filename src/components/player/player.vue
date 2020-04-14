@@ -49,7 +49,7 @@
               <div class="progress-bar-wrapper">
                 <progressBar :duration='duration' :percent='currentTime' @change="change"></progressBar>
               </div>
-              <span class="time time-r">{{formatTime(duration)}}</span>
+              <span class="time time-r" v-if="duration">{{formatTime(duration)}}</span>
             </div>
 
             <div class="operators">
@@ -57,13 +57,13 @@
                 <i :class="iconMode"></i>
               </div>
               <div class="icon i-left">
-                <i class="el-icon-d-arrow-left" @click="prev"></i>
+                <i class="el-icon-d-arrow-left" @click="prev" :class="songReady==false?'disable':''"></i>
               </div>
               <div class="icon i-center" >
                 <i :class="playIcon" @click="togglePlaying"></i>
               </div>
               <div class="icon i-right" >
-                <i class="el-icon-d-arrow-right" @click="next"></i>
+                <i class="el-icon-d-arrow-right" :class="songReady==false?'disable':''" @click="next"></i>
               </div>
               <div class="icon i-right" @click="toggleCollect(currentSong)">
                 <i class="icon" :class="collectCls(currentSong)"></i>
@@ -95,7 +95,7 @@
       </transition>
       <PlayList ref="PlayList"></PlayList>
       <audio :src ="currentSong.song_url" ref="audio" 
-      @canplay="ready" @error="error" @timeupdate="updateTime" @ended="ended"></audio>
+      @play="ready" @error="error" @timeupdate="updateTime" @ended="ended"></audio>
   </div>
 </template>
 
@@ -149,7 +149,16 @@ export default {
         'disc'
     ]),
     playIcon() {
-      return this.playing? 'el-icon-video-pause' : 'el-icon-video-play'
+      if(!this.songReady) {
+        if(this.playing) {
+          return 'el-icon-video-play disable'
+        }else {
+          return 'el-icon-video-pause disable'
+        }
+      }else {
+        return this.playing? 'el-icon-video-pause' : 'el-icon-video-play'
+      }
+      
     },
     cdCls() {
       return this.playing? 'play' : 'play pause'
@@ -177,6 +186,9 @@ export default {
       this.setFullScreen(true)
     },
     togglePlaying() {
+      if(!this.songReady) {
+        return
+      }
       this.setPlayingState(!this.playing);
       if(this.currentLyric) {
         this.currentLyric.togglePlay() //歌词暂停播放回调
@@ -191,7 +203,7 @@ export default {
       if(this.playList.length == 1) { //当列表只有一首歌时
         this.loop()
         this.setPlayingState(true)
-        
+        return
       }else {
 
         let index = this.currentIndex - 1;
@@ -214,6 +226,7 @@ export default {
       if(this.playList.length == 1) { //当列表只有一首歌时
         this.loop()
         this.setPlayingState(true)
+        return
       }else {
         let index = 0;
         if(this.mode == playMode.random) {
@@ -233,8 +246,13 @@ export default {
       this.songReady = false;
     },
     ready(e) {
-      this.duration = e.target.duration;
-      console.log('this.duration:'+this.duration)
+      setTimeout(() => {
+        this.duration = e.target.duration;
+        // console.log(e)
+        console.log('this.duration:'+this.duration)
+      },500)
+      
+      
       this.songReady = true;
       //存储最近播放
       let obj = {
@@ -311,7 +329,7 @@ export default {
       this.setCurrentIndex(index)
     },
     getSongLrcById() { //获取歌词
-      let url ='http://localhost:8888/singer/getSongLrcById/'+this.currentSong.song_id;
+      let url =this.dataIp+'/singer/getSongLrcById/'+this.currentSong.song_id;
       this.$http.get(url)
       .then(result => {
           // console.log(result);
@@ -319,6 +337,10 @@ export default {
           this.currentLyric = new Lyric(result.bodyText,this.handler);
           this.hasLyric = true;
           this.currentLyric.play();
+          
+          if(this.playing == false) {
+            this.currentLyric.stop();
+          }
       })
       .catch(err => {
         console.log(err);
@@ -418,6 +440,7 @@ export default {
   },
   watch: {
     currentSong(newSong,oldSong) {  
+      console.log('点击却换了')
       console.log(newSong)
       console.log(oldSong)
       if(newSong == undefined) {
@@ -435,6 +458,7 @@ export default {
       if(this.currentLyric) {
         this.currentLyric.stop();
       }
+
       this.getSongLrcById();
       setTimeout(()=>{
         this.duration = this.$refs.audio.duration; //获取时长
@@ -446,6 +470,7 @@ export default {
       this.$nextTick(()=> {
         this.$refs.audio.play();  //歌曲改变时播放
       })
+      
     },
     playing(newPlaying) {   //播放暂停
       // console.log('newPlaying:'+newPlaying)
@@ -457,7 +482,7 @@ export default {
         if(audio) {
           newPlaying ? audio.play() : audio.pause();
         }
-      },300)
+      },400)
      
     },
     currentIndex(newIndex) {
@@ -688,6 +713,11 @@ export default {
 .mini-enter,.mini-leave-to {
   transform: translateY(200px);
   opacity: 0;
+}
+
+.disable {
+  pointer-events: none;
+  color: rgba(122, 122, 122, 0.555);
 }
 
 

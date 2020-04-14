@@ -61,7 +61,7 @@ export default {
         },1001)
       },
       getSongListByTag() {
-        let url ='http://localhost:8888/category/getCategoryByTag/'+this.$route.params.tag;
+        let url =this.dataIp+'/category/getCategoryByTag/'+this.$route.params.tag;
         this.$http.jsonp(url)
         .then(result => {
             this.cateList = result.body;

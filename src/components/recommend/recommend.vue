@@ -65,6 +65,8 @@ export default {
     ])
   },
   created() {
+      console.log('this.dataIp: '+this.dataIp)
+      
       this.getSongList();
       // this.changeRec();
       this.loadRec();
@@ -72,6 +74,19 @@ export default {
       // setTimeout(function(){
       //   _self.getSongList();
       // },1000)
+      //刷新scroll
+      setTimeout(()=> {
+        this.$refs.scrollView.refresh();
+        console.log('刷新scroll')
+      },1001)
+      
+  },
+  mounted() {
+      setTimeout(()=> {
+        this.$refs.scrollView.refresh();
+        console.log('刷新scroll')
+      },1001)
+      
   },
   methods: {
     ...mapMutations({
@@ -104,7 +119,8 @@ export default {
       },1001)
     },
     getSongList() {
-      this.$http.get('http://localhost:8888/recommend/getSongList')
+      let url = this.dataIp+'/recommend/getSongList'
+      this.$http.get(url)
       .then(res => {
         this.listInfo = res.body.list;
         //console.log(this.listInfo);
@@ -128,7 +144,8 @@ export default {
       saveStorage('lovetag',obj)
 
       //发送数据到服务器 并储存到数据库
-      let url = 'http://localhost:8888/recommend/saveTag'
+      // let url = 'http://localhost:8888/recommend/saveTag'
+      let url = this.dataIp+'/recommend/saveTag'
       this.$http.jsonp(url,{params: obj})
       .then(result => {
           //console.log(result);
@@ -224,7 +241,8 @@ export default {
       let loveTag = [];
       let arr = [];
 
-      let url = 'http://localhost:8888/recommend/getTag'
+      // let url = 'http://localhost:8888/recommend/getTag'
+      let url = this.dataIp+'/recommend/getTag'
       this.$http.jsonp(url)
       .then(result => {
           //console.log(result);
@@ -296,7 +314,7 @@ export default {
         console.log(maxIndex)
         console.log(moreTag)
 
-        this.searchRec('http://localhost:8888/recommend/getRecList', 3, [moreTag,secondTag])
+        this.searchRec(this.dataIp+'/recommend/getRecList', 3, [moreTag,secondTag])
         .then((res)=> {
           // console.log(res)
           if(res) {
@@ -307,6 +325,9 @@ export default {
             
           }
         })
+
+        //刷新scroll
+        this.$refs.scrollView.refresh();
 
       },200)
       
@@ -442,7 +463,7 @@ export default {
     overflow: hidden;
     text-align: left;
     width: 32%;
-
+    min-height: 168.1px;
     /* flex: 0.33; */
   }
   .rec-item h1 {

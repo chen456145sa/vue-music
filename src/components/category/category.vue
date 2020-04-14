@@ -85,7 +85,7 @@ export default {
       
     },
     getCategory() {
-      let url ='http://localhost:8888/category/getCategory';
+      let url =this.dataIp+'/category/getCategory';
       this.$http.jsonp(url)
       .then(result => {
           //console.log(result);
@@ -124,9 +124,6 @@ export default {
     padding: 7.5px 7.5px;
     font-weight: 600;
     color: rgb(44, 130, 228);
-  }
-  .cate-container {
-
   }
   .item {
     box-sizing: border-box;

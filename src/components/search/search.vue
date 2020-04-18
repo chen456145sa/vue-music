@@ -7,7 +7,7 @@
           <h1 class="title">热门搜索</h1>
           <ul class="hotlist">
             <li v-for="item in hotkey" :key="item.k" @click="setInput(item)">
-              <span>{{item.k}}</span>
+              <span>{{item.query}}</span>
             </li>
           </ul>
         </div>
@@ -86,11 +86,16 @@ export default {
       },1001)
     },
     getHotKey() {
-      let url =this.dataIp+'/search/getHotKey';
-      this.$http.jsonp(url)
+      // let url =this.dataIp+'/search/getHotKey';
+      let url =this.dataIp+'/search/getSearch';
+      let data = {
+        num : 10
+      }
+      this.$http.jsonp(url, {params: data})
       .then(result => {
           //console.log(result);
-          this.hotkey = result.body.hotkeyList;
+          // this.hotkey = result.body.hotkeyList;
+          this.hotkey = result.body;
           // console.log(this.hotkey)    
       })
       .catch(err => {
@@ -98,8 +103,8 @@ export default {
       })
     },
     setInput(item) {
-      this.$refs.searchbox.setQuery(item.k)
-      this.query = item.k;
+      this.$refs.searchbox.setQuery(item.query)
+      this.query = item.query;
     },
     getQuery(val) {
       // console.log(val)

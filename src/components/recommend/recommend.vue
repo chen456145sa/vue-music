@@ -148,8 +148,8 @@ export default {
       let url = this.dataIp+'/recommend/saveTag'
       this.$http.jsonp(url,{params: obj})
       .then(result => {
-          //console.log(result);
-          this.results = result.body;
+          console.log(result.body);
+          // this.results = result.body;
       })
       .catch(err => {
           console.log(err);

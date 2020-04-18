@@ -156,11 +156,15 @@ export default {
             img_url: singer.singer_pic
         }
         this.setSinger(obj);  
+        this.saveSearch(singer.singer_name); //存入数据库
+        
         this.$router.push({  //编程路由
             path: "/search/singer/"+obj.id
         })
 
-        this.setHistory(singer.singer_name);
+        this.setHistory(singer.singer_name); 
+        
+
     },
     selectSong(song){   //设置播放列表 打开播放器
 
@@ -168,6 +172,7 @@ export default {
         this.setClicked(true)
         this.insertSong(song);
 
+        this.saveSearch(song.song_name); //存入数据库
     },
     listbeforeScroll() {  //滚动之前收起模拟键盘
         this.$emit('beforeScroll')
@@ -179,7 +184,29 @@ export default {
         if(this.$refs.suggestScroll) {
            this.$refs.suggestScroll.refresh() 
         } 
+    },
+    saveSearch(query) {   //存储 hotkey
+        let url = this.dataIp + '/search/saveSearch'
+        let data = {
+            query: query
+        }
+
+        this.$http.jsonp(url,{params: data})
+        .then(result => {
+            console.log(result.body);
+            // this.results = result.body;
+            // console.log(this.results)
+            // resolve(  result.body)
+
+        })
+        .catch(err => {
+            console.log(err);
+            // reject(err)
+        })
+
+        
     }
+    
       
   },
   watch: {

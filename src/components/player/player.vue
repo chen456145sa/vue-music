@@ -95,7 +95,7 @@
       </transition>
       <PlayList ref="PlayList"></PlayList>
       <audio :src ="currentSong.song_url" ref="audio" 
-      @play="ready" @error="error" @timeupdate="updateTime" @ended="ended"></audio>
+      @canplay="ready" @error="error" @timeupdate="updateTime" @ended="ended"></audio>
   </div>
 </template>
 
@@ -642,9 +642,9 @@ export default {
 .icon ,.i-right {
   text-align: left;
 }
-.icon-loop,.icon-shuffle{
-  /* font-size: 28px; */
-}
+/* .icon-loop,.icon-shuffle{
+  font-size: 28px;
+} */
 .progress-wrapper {
   display: flex;
   align-items: center;

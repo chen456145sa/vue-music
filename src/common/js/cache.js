@@ -49,6 +49,7 @@ export function clearSearch() {
 //封装
 export function saveStorage(key, val) {
     let Storage = storage.get(key, []);
+    
     let index = Storage.findIndex((item) => {
         return item.id == val.id
     })

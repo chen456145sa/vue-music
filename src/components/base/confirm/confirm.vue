@@ -55,7 +55,7 @@ export default {
       doMethod(fn) {  //执行方法
         let _self = this;
         let methods = this.$options.methods
-        methods[fn](_self)
+        methods[fn](_self) //实用
       }
   }
 }

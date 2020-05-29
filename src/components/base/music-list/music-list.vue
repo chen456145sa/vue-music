@@ -5,7 +5,8 @@
           <span class="break el-icon-back" @click="back"></span>
           <!-- <span class="el-icon-back"></span> -->
           <h1 class="name">{{this.title}}</h1>
-          <a href="javascript:;" class="randomBtn" ref="randomBtn" @click.stop.prevent="randPlay">随机播放</a>
+          <a href="javascript:;" class="randomBtn" ref="randomBtn" @click.stop.prevent="randPlay"
+          :class="songList.length>0? 'randomBtn':'forbitClick'">随机播放</a>
         </div>
       </div>
 
@@ -239,5 +240,8 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
+  }
+  .forbitClick {
+    pointer-events:none;
   }
 </style>

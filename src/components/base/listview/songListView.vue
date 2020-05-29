@@ -26,6 +26,7 @@ export default {
   methods: {
     selectItem(song,index) {
       this.$emit('select', song, index);
+      // console.log('第一个index: '+index)
     }
   }
 }

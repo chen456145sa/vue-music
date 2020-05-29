@@ -52,7 +52,8 @@ export default {
     ...mapGetters([
       'favoriteList',
       'currentIndex',
-      'clicked'
+      'clicked',
+      'currentSong'
     ])
   },
   components: {
@@ -64,6 +65,9 @@ export default {
       'insertSong',
       'deleteFavorite'
     ]),
+    ...mapMutations({
+      setFullScreen: 'SET_FULL_SCREEN',
+    }),
     handlePlayList(list) { //适配底部
       let bottom = list.length>0 ? '80px' : '';
       setTimeout(() => {
@@ -87,6 +91,12 @@ export default {
       }
     },
     playItem(item) {
+      //判断是否是当前歌曲
+      if(item.name == this.currentSong.song_name) {
+        console.log('歌曲相同，打开播放器')
+        this.setFullScreen(true);
+        return
+      }
       //请求歌曲信息
       this.$http.get(this.dataIp+'/collection/'+item.id)
       .then(res => {
